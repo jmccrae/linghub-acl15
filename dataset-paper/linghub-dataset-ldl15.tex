@@ -96,6 +96,31 @@ The rest of the paper is structured as follows...
 
 \section{Extraction of data}
 
+In order to ensure that all the data from many sources can be queried in a
+homogenous manner we had to convert them to RDF. This process is also proved to
+be a valuable opportunity to align these vocabularies with standard vocabularies
+and fix any modelling errors. Two of our resources, LRE-Map and Datahub, were already available in RDF
+and thus, it should be the case that that the conversion of these resources
+required only renaming the URLs so that they would resolve without any
+collisions when uploaded to the Linghub portal. In fact, we also took this
+opportunity to fix a number of quality issues, such as fixing property values to
+either literals or URIs, reducing the number of blank nodes and changing
+modelling to that recommended in relevant standards, such as
+VOID~\cite{alexander2011describing}. 
+
+The other resources used XML schemas, for which we needed to create a custom
+conversion for each of them, which we did with the help of an invertible
+transformation language similar to XSLT. For META-SHARE, this was a challenging
+task as there were nearly a thousand unique tags defined and each one was
+examined to see if it was similar to an existing Semantic Web vocabulary, and in
+fact we ended up mapping to FOAF~\footnote{\url{http://xmlns.com/foaf/spec/}},
+SWRC~\footnote{\url{http://ontoware.org/swrc/}} and the Media
+Ontology~\footnote{\url{http://www.w3.org/TR/mediaont-10/}}. In the case of
+CLARIN, there was actually a significant difference between the XML schemas used
+by each contributing instance, with only a small common section giving the
+resource title and download link. We thus developed distinct mappings for the
+largest X institutes.
+
 \section{Harmonization and duplicate detection}
 
 \section{The Linghub portal}
