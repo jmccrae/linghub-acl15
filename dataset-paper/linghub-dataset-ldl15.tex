@@ -1,0 +1,122 @@
+\documentclass[11pt]{article}
+\usepackage{acl2015}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+
+\usepackage{makecell}
+\usepackage{pbox}
+\usepackage{color}
+\usepackage{graphicx}
+
+\setlength\titlebox{6cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{Linghub: Aggregated Metadata about Language Resources as Linked Data}
+
+\author{John P. McCrae, Philipp Cimiano \\
+  CIT-EC, Bielefeld University \\
+  Bielefeld, Germany \\
+  {\scriptsize\tt\{jmccrae, cimiano\}@cit-ec.uni-bielefeld.de}}
+%\\
+%  {\bf Victor Rodr\'iguez Doncel, Daniel Vila-Suero}\\
+%  {\bf Jorge Gracia} \\
+%  Universidad Polit\'ecnica de Madrid \\
+%  Madrid, Spain \\
+%  {\scriptsize\tt\{vrodriguez, dvila, jgracia\}@fi.upm.es} \\\And
+%  Luca Matteis, Roberto Navigli \\
+%  University of Rome, La Sapienza \\
+%  Rome, Italy \\
+%  {\scriptsize\tt \{matteis, navigli\}@di.uniroma1.it} \\
+%  {\bf Andrejs Abele, Gabriela Vulcu}\\
+%  {\bf Paul Buitelaar} \\
+%  Insight Centre, National University of Ireland\\
+%  Galway, Ireland \\
+%  {\scriptsize\tt \{andrejs.abele, gabriela.vulcu,}\\
+%  {\scriptsize\tt paul.buitelaar\}@insight-centre.org} \\}
+ 
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+    Abstract.
+\end{abstract}
+
+\section{Introduction}
+
+Language resources are essential for nearly all tasks in natural language
+processing (NLP) and in particular
+for the adaptation of resources and methods to new domains and languages. In
+order to use language resources for new purposes they must first be discovered
+and this can only be done if there is a comprehensive list of all resources that
+may be available. To this there have been a number of projects that have
+attempted to collect such a catalogue using various methods and with differing
+degrees of data quality. We present a new portal, Linghub, that aims to integrate all
+these data from different sources by means of linked data and thus to create a
+portal, whereby all information about language resources can be included and
+queried using a common methodology. As such, this resource will enable wider
+discovery of language resources for researchers in NLP, computational
+linguistics and linguistics.
+
+Currently, the approaches to metadata collection can be split into two broad
+classes: firstly, \emph{curatorial} resources, which are those for which collections of
+language resources are maintained by one or more institute. Such resources have
+an advantage in that such metadata is normally of very high quality, however the
+resulting data often fails to cover the whole spectrum of data available.
+Examples of this include the META-SHARE~\cite{federmann2012meta} project and the
+CLARIN project's Virtual Language Observatory~\cite[VLO]{van2012semantic}. On
+the other hand, \emph{collaborative} approaches rely on data publishers
+self-reporting data about their own language resources. This can be advantageous
+as it allows reporting by researchers not directly collected to existing
+infrastructure projects, however the resulting data is often of lower quality as
+the systems may use free-text input or tagging input rather than controlled
+vocabularies, as they are easier for non-expert users to understand.
+
+Given the nature of this difference we wish to make data available from multiple
+sources in a homogeneous manner and to this end we adopted a model based on the
+DCAT data model~\cite{maali2014data} along with properties from Dublin
+Core~\cite{weibel1998dublin}. In addition, we used the RDF
+version~\cite{mccrae2015ontology} of the META-SHARE
+model~\cite{gavrilidou2012meta}, to provide for metadata properties that are
+specific to language data and linguistic research. As such, in this paper we
+describe the creation of the largest collection of information about language
+resources and briefly describe its publication on the Web by means of linked
+data principles.
+
+The rest of the paper is structured as follows...
+
+\section{Related Work}
+
+\section{Extraction of data}
+
+\section{Harmonization and duplicate detection}
+
+\section{The Linghub portal}
+
+\section{Conclusion}
+
+
+\section*{Acknowledgments}
+
+%LingHub was made possible due to significant help from a large number of people,
+%in particular we would like to thank the following people: Benjamin Siemoneit
+%(Bielefeld University), Tiziano Flati (University of Rome, La Sapienza), Martin
+%Br\"ummer (University of Leipzig), Sebastian Hellmann (University of Leipzig),
+%Bettina Klimek (University of Leipzig), Penny Labropolou (IEA-ILSP), Juli
+%Bakagianni (IEA-ILSP), Stelios Piperidis (IEA-ILSP), Nicoletta Calzolari
+%(ILC-CNR), Riccardo del Gratta (ILC-CNR), Marta Villegas (Pompeu Fabra),
+%N\'uria Bel (Pompeu Fabra) and Christian Chiarcos (Goethe-University Frankfurt).
+%
+%+Asun
+
+\bibliographystyle{acl}
+\bibliography{../linghub-acl15}
+
+\end{document}

@@ -1,0 +1,625 @@
+\documentclass[11pt]{article}
+\usepackage{acl2015}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+
+\usepackage{makecell}
+\usepackage{pbox}
+\usepackage{color}
+\usepackage{graphicx}
+
+\setlength\titlebox{6cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{Reconciling Heterogeneous Descriptions of Language Resources}
+
+%\author{John P. McCrae, Philipp Cimiano \\
+%  CIT-EC, Bielefeld University \\
+%  Bielefeld, Germany \\
+%  {\scriptsize\tt\{jmccrae, cimiano\}@cit-ec.uni-bielefeld.de} \\
+%  {\bf Victor Rodr\'iguez Doncel, Daniel Vila-Suero}\\
+%  {\bf Jorge Gracia} \\
+%  Universidad Polit\'ecnica de Madrid \\
+%  Madrid, Spain \\
+%  {\scriptsize\tt\{vrodriguez, dvila, jgracia\}@fi.upm.es} \\\And
+%  Luca Matteis, Roberto Navigli \\
+%  University of Rome, La Sapienza \\
+%  Rome, Italy \\
+%  {\scriptsize\tt \{matteis, navigli\}@di.uniroma1.it} \\
+%  {\bf Andrejs Abele, Gabriela Vulcu}\\
+%  {\bf Paul Buitelaar} \\
+%  Insight Centre, National University of Ireland\\
+%  Galway, Ireland \\
+%  {\scriptsize\tt \{andrejs.abele, gabriela.vulcu,}\\
+%  {\scriptsize\tt paul.buitelaar\}@insight-centre.org} \\}
+ 
+\author{Author \\
+    Address Line 1\\
+    Address Line 2\\
+{\scriptsize\tt email@example.com}}
+
+
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+	Language resources are a cornerstone of linguistic research as well as for the development of natural language processing tools, 
+	but the discovery of relevant resources remains a challenging task.
+        This is due to the fact that relevant metadata entries are spread among
+        different repositories and it is currently impossible to query all these
+        repositories in an integrated fashion, as they use different data
+        models and vocabularies. In this paper we present a first attempt to
+        collect and harmonize the metadata of different repositories, thus
+        making them queryable and browsable in an integrated way. We make used
+        of RDF and linked data technologies for this and provide a first level
+        of harmonization of the vocabularies used in the different resources by
+        mapping them to standard RDF vocabularies including Dublin Core and DCAT. Further, we present an approach that relies on NLP and in particular word sense disambiguation techniques to harmonize resources by mapping values of attributes -- such as the type, license or intended use of a resource -- into normalized values. Finally, as there are duplicate entries within the same repository as well as across different repositories, we also report results of a simple yet effective method to detect such duplicates.
+\end{abstract}
+
+\section{Introduction}
+
+Language resources are the cornerstone of linguistic research as well as computational linguistics. Within NLP, for instance, most tools developed require a corpus for being trained (e.g. language models, statistical taggers, statistical parsers, and statistical machine translation systems) or they require lexico-semantic resources as background knowledge to perform some task (e.g. word sense disambiguation). 
+As the number of language resources available keeps growing, the task of discovering and finding resources that are pertinent to a particular task becomes increasingly difficult. While there are a number of repositories that collect and index metadata of language resources, such as META-SHARE~\cite{federmann2012meta},
+CLARIN~\cite{broeder2010data}, LRE-Map~\cite{calzolari2012lre} and
+Datahub.io\footnote{\url{http://datahub.io/}}, they do not provide a complete solution to the discovery problem for two reasons. First, integrated search over all these different repositories is not possible, as they use different data models, different vocabularies and expose different interfaces and APIs. 
+Second, these repositories must strike a balance between quality and coverage,
+either opting for coverage at the expense of quality of metadata, or \emph{vice
+versa}.
+
+In this paper we address the challenge of harmonizing the metadata originating from the above mentioned repositories and propose an approach that attempts to maximize coverage by indexing the union of the entries from all these repositories, while at the same time ensuring the quality of the data by mapping the values of attributes into a normalized representation that supports querying and browsing data across the different repositories. Our methodology is as follows:
+
+\begin{enumerate}
+\item \textbf{Metadata collection:} We collect the metadata records from four repositories: META-SHARE, CLARIN, LRE-Map and Datahub.io. These resources are very
+different in terms of their size and coverage, and most importantly use very
+different data models.
+\item \textbf{Schema Matching:} To enable all these resources to be represented using the same metadata
+model, we apply transformation scripts to the different datasets to transform their metadata into RDF using DCAT~\cite{maali2014data}, Dublin Core~\cite{weibel1998dublin} and DataID ~\cite{brummer2014dataid} for a basic harmonization between resources at the schema level. 
+\item \textbf{Metadata harmonization:} Striving for a stronger harmonization at
+    the data level such that resources are not only described by the same
+    attributes by also the same value for those attributes, we apply word sense
+    disambiguation techniques to normalize values of the data to support
+    cross-repository harmonization and thus integrated querying of the data.% In harmonizing the data, we focus on four attributes, i.e. \emph{language}, \emph{resource type}, \emph{rights} and \emph{availability}.
+\item \textbf{Duplicate detection:} We apply duplicate detection techniques to find duplicates both within one and across different repositories.
+%\item \textbf{Publication:} We make the harmonized dataset available through a portal called LingHub that is both accessible to machines as it builds on Linked Data principles and releases a SPARQL endpoint, as well as to humans as it can be browsed via a standard browser.
+\end{enumerate}
+
+%\textcolor{red}{JG: these items should map better with the subsequent sections (which are metadata collection, metadata cleaning, and duplicate detection)}
+
+%\textcolor{red}{JG: shall we add the URL of lingub, or better not because of anonymity?}
+
+As the main contribution of this paper, we present the methods used to harmonize
+data across repositories. Due to the different kinds of values and target
+taxonomies chosen for each property, these methods vary but all are based on
+state-of-the-art NLP techniques, including word sense disambiguation, and make
+major improvements to the data quality of our resource records.
+%In particular, we present methods that rely on state-of-the-art word sense disambiguation algorithms to map values of attributes to a normalized representation. We apply this method to normalize the values of attributes such as language and type. We show that this is an effective method for normalizing the data. 
+Second, we show indeed that duplicate metadata entries are pervasive and that they occur both within and across repositories. We then present a simple yet effective approach to detect duplicates within and across repositories. 
+
+The paper is structured as follows: we give an overview of work related to harmonization of data as well as an overview of existing metadata repositories for linguistic data in Section \ref{rel_work}. We describe our metadata collection and schema matching strategy in Section \ref{collection}. We describe our techniques for metadata harmonization in Section \ref{harmonization}. We describe our methods for duplication detection in Section \ref{duplicates}. The performance of the different techniques is reported in each of these sections. We discuss our methodology and approach from a larger point of view in Section \ref{discussion}. 
+
+
+\section{Related Work}
+
+\label{rel_work}
+
+Interoperability of metadata is an important problem in many domains and harmonizing schemas from different sources has been recognized as a major challenge 
+\cite{nilsson2010interoperability,khoo2010merging,nogueras2004metadata}. 
+There are different approach to data integration. One approach consists on
+mapping data to one \emph{monolithic} ontology that needs to be general enough
+to accommodate all the data categories from different sources. While this is 
+appealing as it supports integrated querying of data, it is not the case that a
+single ontology will necessarily be weaker at modelling some aspects of resource
+records. In contrast, the linked data approach relies on
+multiple, standardized smaller and reusable vocabularies, each representing a 
+subset of the data.  In this line, some people have recommended (\cite{brooks2006towards}):
+
+\begin{quote}
+``A larger set of ontologies sufficient for particular purposes should
+be used instead of a single highly constrained taxonomy of values.''
+\end{quote}
+
+%Many of these communities have independently adopted RDF models to enable open
+%schemas, and there have even been attempts to generate metadata in RDF
+%automatically~\cite{jenkins1999automatic}. 
+
+
+In the context of linguistic data, different approaches have been pursued to collect metadata of resources. 
+Large consortium-led projects and initiatives such as the CLARIN projects and
+METANET have attempted to create metadata standards for representing linguistic data. 
+Interoperability of the data stemming from these two repositories is however severely limited to due incompatibilities in their data models.
+META-SHARE favors a top-down approach in which a relatively complex XML schema is provided to describe metadata of resources ~\cite{gavrilidou2012meta}. At the same time, considerable effort has been devoted to ensuring data quality ~\cite{piperidis2012meta}.
+In contrast, CLARIN does not provide a single schema, but a set of `profiles'
+that are described in a schema language called the \emph{CMDI Component Specification Language}~\cite{broeder2012cmdi}. Each party describing resources using CMDI can instantiate the vocabulary to suit their particular needs.
+
+Other more decentralized approaches are found in initiatives such as the \emph{LRE Map} which provides a repository for researchers which want to submit the resources accompanying papers submitted to conferences. Quality control is very limited and researchers are relatively free in how to specify metadata. 
+
+Similarly the \emph{Open Linguistics Working Group}~\cite{chiarcos2012open} has
+been collecting language resources published as linked data in a crowd-sourced
+repository at Datahub.io, in order to monitor the \emph{Linguistic Linked Data
+cloud} and produce a diagram showing the status of these resources.
+
+This clearly shows that the field is very fragmented, with different
+players using different approaches and most importantly different meta- and 
+data models, thus impeding the discovery and integration of linguistic data. 
+
+\section{Metadata collection and Schema Matching}
+
+\label{collection}
+
+\begin{table}
+    \begin{tabular}{l|r|r|r}
+        \thead{Source} & \thead{Records} & \thead{Triples} & \thead{Triples per \\ Record} \\
+        \hline                                              
+        META-SHARE &   2,442 &   464,572 & 190.2 \\
+        CLARIN     & 144,570 & 3,381,736 &  23.4 \\
+        Datahub.io &     218 &    10,739 &  49.3 \\
+        LRE-Map    &   5,712 &    79,576 &  13.9 \\
+    \end{tabular}
+    \caption{\label{tab:resource-sizes}The sizes of the resources in terms of
+    number of metadata records and total data size}
+\end{table}
+
+In this section we describe the different methods applied to collect metadata from the different repositories:
+
+\begin{itemize}
+\item \textbf{META-SHARE:} For META-SHARE, a dump of the data was
+provided by the ILSP managing node of META-NET in XML format. We developed a custom script to convert this
+into the RDF data model, making sure to align data elements to the
+Dublin Core metadata vocabulary and add these as extra triples to the root
+of the record. Frequently, these properties were deeply nested in the XML file
+and manual analysis was required to detect which instances truly applied to the
+entire resource record.
+
+\item \textbf{CLARIN:} For CLARIN, we rely on the OAI-PMH~\cite{sompel2004resource} framework to harvest data.
+The harvested OAI-PMH records comprise a header with basic information as well as a download link and a secondary XML description
+section that is structured according to the particular needs of the data provider.
+So far, we limit ourselves to collecting only those records that
+have Dublin Core properties.
+\item \textbf{LRE-Map:} For LRE-Map we used the available RDF/XML data
+    dump\footnote{\url{http://datahub.io/organization/institute-for-computational-linguistics-ilc-cnr}},
+    which contains submission information from the LREC 2014 conference, as well as data
+    scraped from their website containing older conferences.
+    In the RDF data, we gathered additional
+    information about language resources, including the title of the paper in which the 
+    resource was published.
+\item \textbf{Datahub.io:} The data from Datahub.io was collected by means of
+    the CKAN API\footnote{\url{http://datahub.io/api/3/} documented at
+    \url{http://docs.ckan.org/en/latest/api/index.html}}. As Datahub.io
+is a general-purpose catalogue we limited ourselves to extracting only those
+resources that were of relevance to linguistics. For this, we used an existing
+list of relevant categories and tags maintained by the Working Group on Open
+Linguistics~\cite{chiarcos2012open}. The data model used by Datahub.io is 
+also based on DCAT, so little adaptation of the data was required.
+\end{itemize}
+
+The total size in terms of records and triples (facts) as well as the average
+number of triples per repository are given in Table \ref{tab:resource-sizes}, where
+we can see significant differences in size and complexity of the resources.
+
+\section{Metadata harmonization}
+
+\label{harmonization}
+
+As metadata has been obtained from different repositories, there are many incompatibilities between the values used in different resources. 
+While some repositories ensure high-quality metadata in general, we also
+discovered inconsistencies in the use of values. For instance, while META-SHARE
+recommends the use ISO 639-3\footnote{\url{http://www-01.sil.org/iso639-3/}} tags for
+languages, a few data entries using English names for the language
+instead of the ISO code. We describe our approach to data value normalization below. In this initial harmonization phase we focused on the key
+questions of whether a resource is available, that is the corresponding URL resolves, the terms and conditions under which the resource can be used, and
+three key aspects that users need to know about resources to help them decide whether the resource matches their needs, namely: the type of the resource (corpus, lexical resource, etc.), languages covered, and intended use of the resource.
+
+\subsection{Availability}
+
+In order to enable applications to (re)use language resources, we should find
+out if the resources described can still be accessed. For this we focused on the
+properties which were mapped to DCAT's `access URL' property in the previous
+section. We observed that these ``access'' URLs frequently point to HTML pages
+containing either download links or information on how to get and use the
+resource. Thus we would like to be able to augment the resource with information
+about which links are valid (alternatively broken links could be removed)
+and what format is expected. Therefore, as we deal with heterogeneous sources and repositories, we 
+analyzed access related characteristics and initially focused on answering two 
+questions: \textit{Is the language resource available and accessible on the Web
+and in what format?}.
+
+To assess the current situation, we crawled and performed an analysis on a set of 
+119,290 URLs~\footnote{This represents only about 60\% URLs in our resource but
+and we did not handle the other due to crawling restrictions}.
+%corresponding to more than 60\% of the complete set of access 
+%URLs\footnote{We collected and harmonized 191,006 URLs but we filtered out the URLs of hd.handle.net from the sample due to crawling restrictions for this domain}\footnote{The complete set of raw results can be accessed here: \url{http://bit.ly/1GxqJI7}}. 
+
+Regarding availability, our analysis showed that more than 95\% of the URLs
+studied corresponded to accessible URLs (i.e., HTTP Response Code 200 OK), which
+indicates that in a high number of cases at least some information is provided
+to potential consumers of the resource.
+
+Concerning the format of resources (see Table \ref{tab:formats} ), our
+assessment showed that more than 66\% of the accessible URLs corresponds to HTML
+pages, around 10\% to RDF/XML documents, and other less machine-processable
+formats such as PDF or JPEG sum up to almost 10\% of the URLs analyzed which is
+in line with our initial hypothesis. It is important to note that these results
+only describe what was returned by the service, and do not well reflect the
+actual format or availability of the data. For example, the high number of
+resources returned RDF/XML is mostly due to two CLARIN contributing institutes
+adopting RDF for their metadata.
+
+%\begin{itemize}
+%	\item \textbf{META-SHARE:} In META-SHARE, more than 95\% of the URLs corresponded to HTML pages and almost 5\% to PDF documents.
+%	
+%	\item \textbf{CLARIN:} In CLARIN, 65\% of the URLs corresponded to HTML pages but we found higher format heterogeneity (JPEG, XML, PDF, compression formats, etc.) and more than 10\% of RDF/XML documents.
+%	
+%	\item \textbf{Datahub.io:} Datahub.io is not only the most heterogeneous source with 19 different formats but also the one providing more machine-processable formats with only 45\% of HTML pages and with almost 30\% of documents in different RDF serializations (mainly RDF/XML and Turtle).
+%	
+%	\item \textbf{LRE-Map:} Finally, LRE-Map is widely dominated by HTML pages (more than 97\%).
+%	
+%\end{itemize}
+
+\begin{table}
+    \begin{center}
+	\begin{tabular}{l|cc}
+            Format   & Resources  & Percentage\\
+		
+		\hline                                              
+                HTML                &	67,419 & 66.2\%\\
+                RDF/XML             &	9,940  & 9.8\% \\
+                JPEG Image          &   6,599  & 6.5\% \\
+                XML (application)   &	5,626  & 5.6\% \\
+                Plain Text          & 4,251    & 4.2\% \\
+                PDF                 &	3,641  & 3.6\% \\
+                XML (text)          & 3,212    & 3.2\% \\
+                Zip Archive         &	801    & 0.8\% \\
+                PNG Image           & 207      & 0.2\% \\
+                gzip Archive        & 181      & 0.2\% \\
+	\end{tabular}
+    \end{center}
+	\caption{\label{tab:formats}The distribution of the 10 most used formats within the
+        analyzed sample of URLs. Note XML is associated with two MIME types.}
+\end{table}
+
+\subsection{Rights}
+%\textcolor{red}{Victor, could you reduce the introduction to a paragraph and focus instead on how you performed the alignment and what the challenges for this task are}
+
+Language resources are generally protected by copyright laws and they cannot be used against the terms expressed by the rightsholders. These terms of use declare the actions that are authorized (e.g. derive, distribute) and the applicable conditions (e.g. attribution, the payment of a fee). They are present in the most important resources, but its automatic retrieval and processing is difficult because of the many forms they may adopt: rights information can appear either as a textual notice or as structured metadata, can consist of a mere reference to a well-known license (like an Open Data Commons or Creative Commons license), or it can point to an institution-specific document in a non-English language. These heterogenous practices prevent the automated processing of licensing information. In the four studied respositories licensing information is described as follows:
+%\textcolor{red}{THIS PART CAN BE REMOVED WITHOUT SIGNIFICANT LOSS OF INFORMATION. REMOVE THIS IF YOU FIND THE DESCRIPTION TOO LONG}
+\begin{description}
+	\item[META-SHARE] Besides the mere reference to a Creative Commons license, META-SHARE recommends using one of their pre-defined legal texts\footnote{\url{http://www.meta-net.eu/meta-share/licenses} }. These texts are applicable in a number of situations and they foresee variate restrictions, such as limiting the user's nature (academic / non-academic), the user's intent (commercial or non-commercial) or its META-SHARE membership among others. The META-SHARE schemata provide also elements for the fine-grain description of these license terms.
+	\item[CLARIN] Clarin defines three kinds of licenses: those which allow the resource to be publicly distributed, those accesible only for research purposes and finally those which impose additional restrictions or whose use require additional constent from the rights holder. Specific rights and conditions are also available.
+	\item[Datahub.io] Datasets in Datahub.io are qualified in different manners. A license can be chosen from a list when registering a new dataset, but it can also be found in the VoID description of the dataset or even within the dataset itself. Only explictly given rights information was considered when harvesting the resources.
+  \item[LRE-Map] Resources are classified according to their availability (e.g. freely available or from the proprietary's web), and the license description is limited to a simple string text.
+\end{description}
+%\textcolor{red}{END OF OPTIONAL PART}
+
+Two challenges are posed for the harmonisation of the rights information: first, identifying the license when it is a general one, and second describing the specific rights and conditions in an homogeneous and semantically rich form. Solving these challenges would enable the response to search-by-license queries (e.g. '\textit{Which german dictionaries can I use in commercial applications?}') across different repositories and it would also ease the task of determining the possible compatible licenses for an aggregation of heterogenously licensed resources.
+
+In order to identify the rights information, a flexible parsing of the resource description was made searching for the title, URI and abbreviation of the most commonly used licenses in different forms (case-insensitive, with and without whitespaces and other similar variations). This information was found in the RDF License dataset \cite{rdflicense}, which also describes their most important aspects as RDF statements. The matching led to occasional errors due the presence of dual-licensing schemes or misleading description, but 95\% of the recognised strings were correctly matched. %3 between 71
+However, the overall recall was very low because a large number of terms and conditions were specific and sometimes in other languages than English. Other NLP techniques might be applied for extracting this information but this sensitive information requires a good precision rate that existing algorithms do not provide. %I CAN CITE THIS TWO WORKS TO SUPPORT THIS IF NEEDED
+Finally, some of the most common licenses present in the META-SHARE and CLARIN have been mapped and updated into the RDF Dataset.
+%I GUESS WE CANNOT GIVE HERE URLS IF WE WANT TO HIDE OUR IDENTITY...
+
+%The RDF License dataset is based on the Open Digital Rights Language (ODRL) vocabulary \footnote{\url{https://www.w3.org/community/odrl/}}, and their terms were mapped to META-SHARE  This dataset also provided a fine-grain description of the permitted rights and the imposed conditions (like attribution or share-alike).
+
+
+\subsection{Usage}
+
+The language resource usage indicates the purpose and application for which 
+the LR was created. For META-SHARE we rely on the 83 values of the 
+{\tt useNLPSpecific} property. In case of LRE-Map we have a more limited list 
+of 28 suggested values and many more user-provided free text entries, 3985 in
+total. We manually mapped the 28 predefined values in LRE-Map to one of the 83 values predefined in META-SHARE.
+For the user-provided intended usage values, we developed a matching algorithm that identifies the 
+corresponding META-SHARE intended use values. First we tokenized the expressions, then we
+stemmed the tokens using the Snowball stemmer and we performed a string
+inclusion match, i.e. check if the META-SHARE usages are included in the
+free text entries. For some entries we retrieved several matches (e.g.
+`Document Classification, Text categorisation' matched both
+`document classification' and `text 
+categorisation') and we assumed that this meant both usages were indicated. 
+With this algorithm we identified 66 matches on a random sample of 100 user-provided entries and they were all correct matches. From 
+the remaining 34 unmatched entries 16 were empty fields or non specific e.g. 
+`not applicable', `various uses'. Other 16 entries were too general to be 
+mapped to a usage e.g. `testing', `acquisition'. We had one 
+false negative `taggin pos' and one usage that is not yet in META-SHARE `semantic system evaluation'. On this basis we had 98-99\% accuracy on the results.
+Following the aforementioned algorithm we identified 65\% matches on the entire 
+set of user-entries. We further investigated the remaining 35\% non-matches and 
+we identified further intended use values that are not yet in META-SHARE vocabulary, e.g. 
+`entity linking', `corpus creation', which we will suggest as extensions of the META-SHARE 
+vocabulary.
+
+    
+\subsection{Language}
+
+To clean the names of languages contained in resource records, we decided to
+conform to the ISO 639-3 standard. First we extracted all the language labels
+from our records and obtained a total of \textbf{833} distinct language labels. Next we leveraged two resources to map these noisy language labels to standard ISO codes: (i) the official SIL database\footnote{\url{http://www-01.sil.org/iso639-3/download.asp}}, which contains all the standard ISO codes and their \textit{English} representation, and (ii) BabelNet\footnote{\url{http://babelnet.org/}} \cite{NavigliPonzetto:12aij}, a large multilingual lexico-semantic resource containing, among others, translations and synonyms of various language names along with their ISO codes. 
+
+To perform the mapping in an automatic way, we compared each of the 833 noisy language labels against the language labels contained in SIL and BabelNet using two string similarity algorithms: the \textit{Dice coefficient} string similarity algorithm and the \textit{Levenshtein} distance string metric. 
+
+\textcolor{red}{JG: add CITES to Dice and Levensthein algorithms}
+
+
+\begin{table}
+\resizebox{0.92\textwidth}{!}{\begin{minipage}{\textwidth}
+    \begin{tabular}{l|c|cc|cc}
+
+Input & \thead{Expected \\ output}  & \multicolumn{2}{c|}{\thead{BabelNet \\ output}} & \multicolumn{2}{c}{\thead{SIL \\ output}} \\
+& & \tiny\textit{dice} & \tiny\textit{leven} & \tiny\textit{dice} & \tiny\textit{leven}\\
+        \hline         
+Kurdish & kur & kur & kur & kur & kur \\    
+\tiny\textit{rank -- distance} & & \tiny 1 & \tiny 0 & \tiny 1 &\tiny 0\\
+\tiny\textit{label} & & \tiny Kurdish & \tiny Kurdish & \tiny kurdish & \tiny Kurdish\\
+\hline
+Bokmål  & nob & nob & nob & bok* & bdt*\\
+\tiny\textit{rank -- distance} & & \tiny 1 & \tiny 0 & \tiny 0.57 &\tiny 3\\
+\tiny\textit{label} & & \tiny bokmål & \tiny Bokmål & \tiny bok & \tiny Bokoto\\                               
+\hline
+\pbox{20cm}{Ñahñú \\ (Otomí)}  & oto & omq* & otm* & ttf* & las*\\
+\tiny\textit{rank -- distance} & & \tiny 0.38 & \tiny 8 & \tiny 0.35 &\tiny 7\\
+\tiny\textit{label} & & \tiny \pbox{20cm}{Otomí\\ Mangue} & \tiny \pbox{20cm}{Eastern\\ Otomí} & \tiny tuotomb & \tiny \pbox{20cm}{lama\\ (togo)}\\     
+\hline
+\pbox{20cm}{Turkish \\(Türkçe)}  & tur & tur & tur & tur & crh*\\
+\tiny\textit{rank -- distance} & & \tiny 0.7 & \tiny 6 & \tiny 0.7 &\tiny 7\\
+\tiny\textit{label} & & \tiny Turkish & \tiny \pbox{20cm}{Türkiye\\Türkçesi} & \tiny turkish & \tiny \pbox{20cm}{Turkish,\\ Crimean}\\                            
+    \end{tabular}
+    
+\end{minipage} }
+    \caption{\label{tab:lang-io}Excerpt output of language mapping. \newline * indicates mismatches.}
+\end{table}
+
+\textcolor{red}{JG: I would remark that the expected output in the table is the ISO value}
+
+The Dice coefficient algorithm takes two strings as inputs and returns a value between 0 and 1 which we call \textit{rank}, where values closer to 0 represent lower similarity and values closer to 1 represent higher similarity. The Levenshtein metric instead returns a value which we call \textit{distance}, and is the number of deletions, insertions, or substitutions required to transform the first input string into the second. Therefore for Levenshtein, a value closer to 0 represents higher similarity. 
+
+Table \ref{tab:lang-io} reports an excerpt of the results showcasing in row 1 a match for all cases, in row 2 a match for BabelNet but not for SIL, and in row 3 a mismatch for all. Furthermore, row 4 reports a mismatch from Levenshtein, where \textsf{Turkish, Crimean} is matched instead.
+
+
+In order to measure the accuracy of each approach we tested the mapping algorithms against a manually annotated dataset containing 100 language labels and ISO codes.
+
+As can be seen in Table \ref{tab:language-comparison}, the best results are obtained using BabelNet as the source of language labels. BabelNet is more accurate in matching language labels, largely because it contains translations, synonyms and obsolete spellings of most, even rare or dialectal, languages. SIL on the other hand only contains the English representation of each ISO code, failing to induce certain mappings. Furthermore, the Dice coefficient string similarity algorithm yields more accurate results compared to the Levenshtein distance metric. We hypothesize that this is mainly due to the fact that the Dice coefficient is more lenient compared to the Levensthein metric as it is insensitive to the order of words. For instance, using Dice coefficient, the input label \textsf{Quechua de Cotahuasi (Arequipa)} matches \textsf{Cotahuasi Quechua} correctly. With the Levenshtein algorithm, however, using the same input as earlier, the label \textsf{Quechua cajamarquino} is mistakenly matched instead.
+
+\begin{table}
+\resizebox{0.78\textwidth}{!}{\begin{minipage}{\textwidth}
+    \begin{tabular}{l|c|c|l}
+        Resource   & Accuracy  & \renewcommand{\arraystretch}{0.5}\begin{tabular}[x]{@{}c@{}}\tiny Frequency\\\tiny Weighted\\Accuracy\end{tabular} & Average\\
+        \hline                                              
+        SIL \small\textit{dice coefficient}  & 81\% & 99.50\% & 0.93 \small\textit{rank}  \\
+        SIL \small\textit{levenshtein}  & 72\% & 99.42\% & 0.80 \small\textit{distance} \\
+        BabelNet \small\textit{dice coefficient} & \textbf{91\%} & 99.87\% & 0.97 \small\textit{rank} \\
+        BabelNet \small\textit{levenshtein} & \textbf{89\%} & 99.85\% & 1.20 \small\textit{distance} \\
+        \hline
+        SIL + BabelNet & & \\
+        \small\textit{dice coefficient} & \textbf{91\%} & 99.87\% & 0.97 \small\textit{rank} \\
+        \small\textit{levenshtein} & \textbf{89\%} & 99.85\% & 1.01 \small\textit{distance} \\
+    \end{tabular}
+    \end{minipage} }
+    \caption{\label{tab:language-comparison}Accuracy of language mappings}
+\end{table}
+
+Overall, combining BabelNet and SIL yields the same normalization accuracy as BabelNet alone. The addition of a multilingual semantic database, such as BabelNet, positively affects the ability to match obsolete names in different languages. 
+
+%\textbf{LM: Since it's anonymous, can we include this? The source code and the data to reproduce these experiments is available at} \url{https://github.com/liderproject/linghub-iso639-3}.
+
+The average column in Table \ref{tab:language-comparison} indicates the average
+value returned by either the Dice coefficient or the Levensthein algorithm. For
+mapping the 833 noisy language labels contained in our records we decided to use the Dice coefficient algorithm against both SIL and BabelNet, and considered accurate results ranking 0.97 or higher. Results that ranked lower than 0.97 were ran against the Levensthein algorithm, and we accepted results ranking 1.01 or lower.
+
+\textcolor{red}{JG: I do not see the point of the average column (what are we concluding from it?). To decide the optimal threshold, I would plot Accuracy vs. rank/distance and pick the values that maximize the curves}
+
+\subsection{Type}
+
+The type property is used primarily to describe the kind of resource being
+described. For META-SHARE, we can rely on the structure of resources to extract
+one of four primary resource types, namely, `Corpus', `Lexical Conceptual
+Resource', `Lexical Description' and `Tool Service'. However, for the other
+sources considered in this paper the type field is simply free text. In order 
+to enable users to query resources by type we ran the Babelfy entity linking
+algorithm~\cite{Moroetal:14tacl} to identify entities in the string and
+then manually selected elements from this list that described the kind of
+resource, such as `corpus'. In this way we extracted, 143 categories for
+language resources while still ensuring that syntactic variations were accounted
+for.
+
+\textcolor{red}{JG: it would be great to report the categories somewhere and add a link here}
+
+\section{Duplicate detection}
+
+\label{duplicates}
+
+\begin{table}
+    \begin{center}
+    \begin{tabular}{l|cc}
+        Resource   & \thead{Duplicate \\ Titles} & \thead{Duplicate \\ URLs} \\
+        \hline                                                            
+        CLARIN     & 52,141           & 2,984          \\   
+        Datahub.io & 0                & 55             \\
+        LRE-Map    & 723              & 510            \\
+        META-SHARE & 65               & 967            \\
+    \end{tabular}
+    \end{center}
+    \caption{\label{tab:self-dupes}The number of duplicate labels and URLs for
+    resources from the same source}
+\end{table}
+
+As we are collecting and indexing metadata entries from different repositories, it is possible to find duplicates of entries across these repositories. 
+In fact, unexpectedly, duplicate entries did not only occur across repositories (we dub these \emph{inter-repository duplicates}) but also within the same resource (referred to as \emph{intra-repository duplicates}). 
+In order to detect duplicates, we rely on two properties
+that should be unique across entries, that is the title and the `access URL'~\footnote{Our data model distinguishes
+    between the `Access URL', which is normally the (HTML) download page and the
+    `Download URL' which is a direct link to the resource. However, this
+    distinction is not generally made by all resources and as such all
+download URLs are treated as access URLs}. We were surprised 
+to discover a significant number of intra-repository duplicates with this heuristic.
+In Table
+\ref{tab:self-dupes} we show the number of records with duplicate titles or URLs.
+Manual inspection of these duplicates yielded the following
+observations:
+
+\begin{description}
+
+	\item[META-SHARE] META-SHARE contains a number of duplicate titles. However, these title duplicates seem to be a side-effect of the way the data has been exported and can thus be easily corrected. 
+
+    \item[CLARIN] Many resources in CLARIN are described across many records.
+        For example, in CLARIN there may be one different metadata entry for each chapter of a book or
+        recording within an audio or television collection, or in at least one case
+        (``The Universal Declaration of Human Rights'') a record exists for each
+        language the resource is available in. Thus, we decided to merge the entries which
+        share the same title and same contributing institute in CLARIN.
+        
+    \item[Datahub.io] The creation method of DataHub prevents the creation of different entries with the same title, so duplicate titles do not occur in the data. However, we found a number of entries having the same download URL. This is due to the fact that different resources share SPARQL endpoints or download pages. \textbf{So what did we do?}
+    
+    \item[LRE-Map] As LRE-Map is collected by means of submission of datasets
+        when uploading papers and that these records may also be resources used
+        in the paper not just resources described by this paper, it is not
+        surprising to find many duplicates. 
+    
+\end{description}
+
+\begin{table*}
+    \begin{center}
+        \begin{tabular}{ll|ccc}
+        Resource    & Resource    & Duplicate Titles & Duplicate URLs & Both \\
+        \hline                                                                  
+        CLARIN      & CLARIN      & 1,222            & 2,884          & 0    \\
+        CLARIN      & Datahub.io  & 1                & 0              & 0    \\
+        CLARIN      & LRE-Map     & 72               & 64             & 0    \\
+        CLARIN      & META-SHARE  & 0                & 1,228          & 0    \\
+        Datahub.io  & LRE-Map     & 59               & 5              & 0    \\
+        Datahub.io  & META-SHARE  & 0                & 0              & 0    \\
+        LRE-Map     & LRE-Map     & 777              & 454            & 359  \\
+        LRE-Map     & META-SHARE  & 0                & 51             & 0    \\
+        \hline
+        All         & All         & 2,131            & 4,686          & 359  \\
+        \end{tabular}
+    \end{center}
+    \caption{\label{tab:dupes}Number of candidate duplicate records by type}
+\end{table*}
+
+\textcolor{red}{JG: Some combinations are missing in the table, such as MS-MS}
+
+Table \ref{tab:dupes} shows the number of resources with the same title (Duplicate Titles), same URL (Duplicate URLs) as well as same title \textbf{and} same URL within and across repositories. 
+We apply the following strategy in removing duplicates:
+
+\begin{enumerate}
+\item Remove intra-repository duplicates from METASHARE as well as metadata entries corresponding to series of data.
+\item Remove inter-repository duplicates.
+\item Remove intra-repository duplicates from LRE-Map and CLARIN as they contain a higher number of duplicates due to the fact that the data originates from different data contributors.
+\end{enumerate}
+
+\textcolor{red}{JG: Is the order important? Why inter-repositories are in the middle?}
+
+We evaluate the precision of this approach on a sample of 100 entries identified as duplicates according to the above mentioned approach. We manually classify the matches into \emph{correct}, \emph{incorrect} as well as \emph{unclear}. Table \ref{tab:dupe-precision} shows these results. We see that with 99\% precision the method identifying duplicates if both title and URL match yields the best results. While the recall is difficult to assess, an analysis of the data quickly reveals that there are many duplicates not detected using this method. For example, for the Stanford Parser, we find metadata records with all of the following titles: ``Stanford Parser'', ``Stanford Dependency Parser'',  ``Stanford Lexicalized Parser'', ``Stanford's NLP Parser'', ``The Stanford Parser'', ``The Stanford Parser: A Lexicalized Parser'', etc.
+
+
+
+\begin{table}
+    \begin{tabular}{l|ccc}
+        Duplication & Correct & Unclear & Incorrect \\
+        \hline                    
+        Titles      &    86   &   6     &    8      \\ 
+        URLs        &    95   &   2     &    3      \\
+        Both        &    99   &   1     &    0      \\
+    \end{tabular}
+    \caption{\label{tab:dupe-precision}Precision of matching strategies from a
+    sample of 100}
+\end{table}
+
+\section{Discussion}
+\label{discussion}
+
+\begin{table}
+    \begin{center}
+    \begin{tabular}{l|cc}
+        Property   &  \thead{Record Count\\(As percentage of all)} & Triples \\
+        \hline
+        Access URL &  91,615 (91.6\%) & 191,006  \\
+        Language   &  50,781 (50.7\%) & 98,267   \\
+        Type       &  15,241 (15.2\%) & 17,894   \\
+        Rights     &       ? (??.?\%) & ?        \\
+        Usage      &   3,397 (33.9\%) & 4,530    \\ 
+    \end{tabular}
+\end{center}
+\caption{\label{tab:total}Number of records and triples (facts) harmonized by our
+    methods}
+\end{table}
+        
+
+The rapid developments of natural language processing technologies in the last
+few years has resulted in a very large number of language resources being
+created and made available on the web. In order to enable these resources to be
+reused appropriately it is necessary to properly document resources and make
+this available as structured, queriable metadata on the Web. Current approaches
+to metadata collection are either \emph{curatorial}, where dedicated workers
+maintain metadata of high quality, such as the approach employed by META-SHARE.
+This approach ensures metadata quality but is very expensive and as such it is
+unlikely that it will be able to handle the vast number of resources published
+every year. In contrast, \emph{crowd-sourced} resources rely on primarily
+self-reporting of metadata, and this approach has a high recall but is very
+error-prone and this unreliability can be plainly seen in resources such as
+LRE-Map. In this paper, we have aimed to break this dichotomy by aggregating
+resources from both curated and crowd sources and apply natural language
+processing techniques to provide a basic level of compliance among these
+resource records. In this sense we have considered a small set of properties that we regards as essential for the description and discovery of relevant language resource, that is: resource type, language, intended use, and licensing conditions.
+For the
+language property we have shown that it can be harmonized across repositories with high accuracy my mapping values to a 
+controlled vocabulary list, although the data indicated that there were still
+many languages which were not covered in the ISO lists. For the type, rights and usage
+properties, whose content is not as limited, it is harder to harmonize but we
+were still able to show that in many cases these results can be connected to
+known lists of values. This is important as it would allow for easier queries of
+the resource. 
+
+Besides harmonizing values of data, we see two further key aspects to ensure quality of the metadata.
+First, dangling links should be avoided as they are indicators of low curation and lacking quality. Thus, we automatically detect such dangling URLs and remove them from the dataset. A second crucial issue is the removal of duplicates, which are also a sign of low quality.
+
+We have investigated different strategies for detecting duplicates. We observed that the case in which two metadata entries have been provided to to different repositories is common. When integrating data from different repositories, these entries become duplicated. In other cases, particularly in CLARIN, different metadata entries are created for parts of a resource. In fact, genuine duplication likely
+effects only about 1\% of records. We further note that it is important to take
+a high precision approach to deduplication as the merging of non-duplicate
+resources can hide resources entirely from the query.
+
+Thus, we have proposed high-precision methods for detecting such duplicates. Towards achieving high recall, a collaborative, user-based approach is thinkable.
+
+
+Finally, we note that the data resulting from this process is available
+under the Creative Commons Attribution Non-Commercial ShareALike License at
+\url{removed-to-ensure-anonymity} and the data can be queried through a portal, which we do not
+describe in this paper, at \url{removed-to-ensure-anonymity}. Furthermore, all
+code described in this paper is accessible at \url{removed-to-ensure-anonymity}.
+
+\section{Conclusion}
+
+We have studied the task of harmonizing records of language resources that are
+heterogeneous on several levels and have shown that the application of NLP
+techniques allows to provide common metadata that will better enable users to
+find language resources for their specific applications. We note that this work
+is still on-going and should be improved in not only the accuracy and coverage
+of harmonization, but also in the number of properties that can are harmonized
+(authorship and subject topic are planned). We hope that this new
+approach to handling language resource metadata will better enable users to find
+language resources and assist in the creation of new domains of study in
+computational linguistics.
+
+\section*{Acknowledgments}
+
+%LingHub was made possible due to significant help from a large number of people,
+%in particular we would like to thank the following people: Benjamin Siemoneit
+%(Bielefeld University), Tiziano Flati (University of Rome, La Sapienza), Martin
+%Br\"ummer (University of Leipzig), Sebastian Hellmann (University of Leipzig),
+%Bettina Klimek (University of Leipzig), Penny Labropolou (IEA-ILSP), Juli
+%Bakagianni (IEA-ILSP), Stelios Piperidis (IEA-ILSP), Nicoletta Calzolari
+%(ILC-CNR), Riccardo del Gratta (ILC-CNR), Marta Villegas (Pompeu Fabra),
+%N\'uria Bel (Pompeu Fabra) and Christian Chiarcos (Goethe-University Frankfurt).
+%
+%+Asun
+
+\bibliographystyle{acl}
+\bibliography{linghub-acl15}
+
+\end{document}
