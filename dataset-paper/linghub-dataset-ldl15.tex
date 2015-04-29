@@ -96,6 +96,21 @@ The rest of the paper is structured as follows...
 
 \section{Extraction of data}
 
+\begin{table}
+	\centering
+	\begin{tabular}{p{30mm}|cc}
+	Source               & Records    & Triples  \\
+	\hline
+	Datahub              &            &          \\
+	META-SHARE           &            &          \\
+	LRE-Map              &            &          \\
+	CLARIN VLO           &            &          \\
+	\hline
+	All                  &            &          \\
+	\end{tabular}
+	\caption{Size of Linghub dataset by source\label{tab:size}}
+\end{table}
+
 In order to ensure that all the data from many sources can be queried in a
 homogenous manner we had to convert them to RDF. This process is also proved to
 be a valuable opportunity to align these vocabularies with standard vocabularies
@@ -123,7 +138,62 @@ largest X institutes.
 
 \section{Harmonization and duplicate detection}
 
+\begin{table*}
+	\centering	
+	\begin{tabular}{p{50mm}p{50mm}|cc}
+	Property     & Target             & Links        & Precision \\
+	\hline
+	Language     & LexVo              &              &           \\
+	Type         & BabelNet           &              &           \\
+	Usage        & META-SHARE OWL     &              &           \\
+	Rights       & License ...        &              &           \\
+	Backlink     & Original Resources &              & n/a       \\
+	\end{tabular}
+	\caption{Number of introduced links in the Linghub data\label{tab:links}}
+\end{table*}	
+
+Two key issues emerge when collecting data from a heterogenous set of sources 
+such as we are doing. Firstly, the data is likely to be noisy and inconsistent 
+in the properties it uses and more importantly in the values that these
+properties have. For example, languages may be represented by their English 
+names or alternatively by means of the codes such as the ISO 639 codes. Secondly,
+it is often the case that a dataset may be recorded in multiple sources and thus,
+we may create multiple records of the same dataset. Furthermore, we often see
+duplication in the form of multiple records describing different sections of a 
+single dataset or multiple usages of the single dataset. In order to remove 
+these duplications we used state-of-the-art word sense disambiguation techniques, 
+including Babelfy~\cite{} to identify common controlled vocabularies and duplicate
+entries. For the case of properties we mapped to several existing resources, 
+including LexVo~\cite{} for languages, and BabelNet for resource types. Duplicate 
+entries were not removed from the dataset but instead were marked with the addition
+of the Dublin Core property \emph{is replaced by}. In the case that these entries
+were subsets of resources the target of this link would be a new combined record
+for the entire resource and in the case of duplicate records collected from distinct
+sources we referred to the most complete triple, that is the record with the most
+triples.
+
 \section{The Linghub portal}
+
+\begin{figure*}
+\includegraphics[width=.9\textwidth]{linghub-screenshot.png}
+\caption{A screenshot of the Linghub interface\label{fig:screenshot}}
+\end{figure*}
+
+In order to enable users to quickly and easily discover datasets, we set up a 
+portal for browsing the dataset. Naturally we set this up as a site that publishes
+the individual records as either RDF or HTML, with the actual content delivered
+to the client decided by means of content negotiation. In addition, we provide a 
+number of mechanisms by which users and automated agents can discover a dataset. 
+In particular, for users we allowed browsing by means of faceted browsing of 
+principle aspects of datasets including language. In addition, we enabled a full
+text search of the data based on the description. Machine based agents may access
+the endpoint by means of SPARQL querying, although the endpoint limits the agents
+to a very specific subset of the SPARQL query language. This is to ensure that 
+the SPARQL querying remains stable and consistent, as full SPARQL queries could
+easily destabilize the server and adding timeouts could lead to unpredictable
+failures. In addition the server returns SPARQL JSON results and so can be called
+easily from a web browser.
+
 
 \section{Conclusion}
 
