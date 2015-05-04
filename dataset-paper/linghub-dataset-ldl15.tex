@@ -94,6 +94,28 @@ The rest of the paper is structured as follows...
 
 \section{Related Work}
 
+There have been several attempts to collect metadata about language resources
+mostly associated with large infrastructure projects. CLARIN has been collecting
+resources under a project called the Virtual Language
+Observatory~\cite{van2012semantic}, using the Component
+Metadata Infrastructure~\cite[CMDI]{broeder2012cmdi} to collect common metadata
+values from multiple sources. A similar project is
+META-SHARE~\cite{piperidis2012meta} from the META-NET project where language
+resources are collected and high-quality, manual entries are created for each
+record. Similarly, the Open Languages Archives
+Community~\cite[OLAC]{bird2003extending} collects data from a number of sources
+although the metadata collected is not itself open. A similar project called
+SHACHI has also collected some metadata~\cite{tohyama2008shachi}. There has also
+been an attempt to track language resources by means of assigning them an
+International Standard Language Resource Number (ISLRN) similar to an ISBN used
+to track books~\cite{choukri2012using}.
+
+On the contrary some resources have instead collected data directly from
+creators of the resources, for example the LRE-Map~\cite{calzolari2012lre} collects data from
+authors of papers submitted to conference, such as LREC. Similarly,
+Datahub~\footnote{\url{http://datahub.io}} collects resources directly from
+those submitted to the website, but focusses primarily on linked data resources.
+
 \section{Extraction of data}
 
 \begin{table}
@@ -101,12 +123,12 @@ The rest of the paper is structured as follows...
 	\begin{tabular}{p{30mm}|cc}
 	Source               & Records    & Triples  \\
 	\hline
-	Datahub              &            &          \\
-	META-SHARE           &            &          \\
-	LRE-Map              &            &          \\
-	CLARIN VLO           &            &          \\
+	Datahub              & 185        & 10,739   \\
+	LRE-Map              & 682        & 10,650   \\
+	META-SHARE           & 2,442      & 464,572  \\
+	CLARIN VLO           & 144,138    & 3,605,196\\
 	\hline
-	All                  &            &          \\
+	All                  & 147,447    & 4,091,157\\
 	\end{tabular}
 	\caption{Size of Linghub dataset by source\label{tab:size}}
 \end{table}
@@ -141,13 +163,13 @@ largest X institutes.
 \begin{table*}
 	\centering	
 	\begin{tabular}{p{50mm}p{50mm}|cc}
-	Property     & Target             & Links        & Precision \\
+	Property     & Target             & Links        \\
 	\hline
-	Language     & LexVo              &              &           \\
-	Type         & BabelNet           &              &           \\
-	Usage        & META-SHARE OWL     &              &           \\
-	Rights       & License ...        &              &           \\
-	Backlink     & Original Resources &              & n/a       \\
+	Language     & LexVo              & 92,717       \\
+	Type         & BabelNet           & 12,139       \\
+	Usage        & META-SHARE OWL     & 1,310        \\
+	Rights       & License Ontology   & 103          \\
+	Backlink     & Original Resources & 146,765      \\
 	\end{tabular}
 	\caption{Number of introduced links in the Linghub data\label{tab:links}}
 \end{table*}	
@@ -162,9 +184,9 @@ we may create multiple records of the same dataset. Furthermore, we often see
 duplication in the form of multiple records describing different sections of a 
 single dataset or multiple usages of the single dataset. In order to remove 
 these duplications we used state-of-the-art word sense disambiguation techniques, 
-including Babelfy~\cite{} to identify common controlled vocabularies and duplicate
+including Babelfy~\cite{Moroetal:14tacl} to identify common controlled vocabularies and duplicate
 entries. For the case of properties we mapped to several existing resources, 
-including LexVo~\cite{} for languages, and BabelNet for resource types. Duplicate 
+including LexVo~\cite{de2013lexvo} for languages, and BabelNet for resource types. Duplicate 
 entries were not removed from the dataset but instead were marked with the addition
 of the Dublin Core property \emph{is replaced by}. In the case that these entries
 were subsets of resources the target of this link would be a new combined record
@@ -197,6 +219,13 @@ easily from a web browser.
 
 \section{Conclusion}
 
+Linghub is a new site that collects data from a large number of sources and
+makes it queriable through a common mechanisms. Furthermore, the data has not
+only been converted to RDF it has also been homogenized and linked to other
+bubbles in the Linguistic Linked Open Data Cloud. As such, this resource is
+likely to pay a pivotal role in enabling not only humans but also software
+agents to find new resources and use them for applications in natural language
+processing and artificial intelligence.
 
 \section*{Acknowledgments}
 
