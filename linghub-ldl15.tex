@@ -230,7 +230,7 @@ data models, thus impeding the discovery and integration of linguistic data.
 \label{collection}
 
 \begin{table}
-\resizebox{0.94\textwidth}{!}{\begin{minipage}{\textwidth}
+\resizebox{0.80\textwidth}{!}{\begin{minipage}{\textwidth}
     \begin{tabular}{l|r|r|r}
         \thead{Source} & \thead{Records} & \thead{RDF Triples} & \thead{Triples per \\ Record} \\
         \hline                                              
@@ -240,7 +240,8 @@ data models, thus impeding the discovery and integration of linguistic data.
         LRE-Map (LREC 2014) &     682 &    10,650 &  15.6 \\
         \hline
         LRE-Map (Non-open)  &   5,030 &    68,926 &  13.7 \\
-        OLAC                & 217,765 &         ? &     ? \\  
+% OLAC size is estimated must be calculated correctly before final version
+        OLAC                & 217,765 & 2,613,183 &  12.0 \\
         ELRA Catalogue      &   1,066 &    22,580 &  21.2 \\
         LDC Catalogue       &     714 &       n/a &   n/a \\
         \hline
@@ -282,10 +283,10 @@ list of relevant categories and tags maintained by the Working Group on Open
 Linguistics~\cite{chiarcos2012open}. The data model used by Datahub.io is 
 also based on DCAT, so little adaptation of the data was required.
 \item \textbf{OLAC:} The Open Language Archives Community also relies on OAI-PMH
-    to collect metadata and overlaps signficantly with the CLARIN VLO.
+    to collect metadata and overlaps significantly with the CLARIN VLO.
     Unfortunately the data on this site is not openly licensed.
 \item \textbf{ELRA and LDC Catalogues:} These two organizations sell language
-    resources and their catalogues are avaiable online. The metadata records are
+    resources and their catalogues are available online. The metadata records are
     not themselves openly licensed.
 \end{itemize}
 
@@ -741,6 +742,7 @@ Parser''.
 \label{discussion}
 
 \begin{table}
+\resizebox{\columnwidth}{!}{%
     \begin{tabular}{l|cc}
         Property   &  \thead{Record Count\\(As percentage of all records)} & Triples \\
         \hline
@@ -749,7 +751,7 @@ Parser''.
         Type       &  15,241 (15.2\%) & 17,894   \\
         Rights     &   3,080 (3.0\%)  & 8915     \\
         Usage      &   3,397 (3.4\%)  & 4,530    \\ 
-    \end{tabular}
+\end{tabular}}
     \caption{\label{tab:total}Number of records and facts harmonized by our
     methods}
 \end{table}

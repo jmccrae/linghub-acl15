@@ -1,5 +1,4 @@
-\documentclass[11pt]{article}
-\usepackage{acl2015}
+\documentclass{acm_proc_article-sp}
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage{url}
@@ -9,28 +8,25 @@
 \usepackage{pbox}
 \usepackage{color}
 \usepackage{graphicx}
-
-\setlength\titlebox{6cm}
-
-% You can expand the titlebox if you need extra space
-% to show all the authors. Please do not make the titlebox
-% smaller than 5cm (the original size); we will check this
-% in the camera-ready version and ask you to change it back.
-
-
-\title{Linghub: Aggregated Metadata about Language Resources as Linked Data}
-
-\author{John P. McCrae$^{\clubsuit,\spadesuit}$, \\
-  $^\clubsuit$ National University of Ireland, Galway \\
-  Galway, Ireland\\
-  {\scriptsize\tt{john@mccr.ae}}\\\And
-    Philipp Cimiano$^{\spadesuit}$ \\
-    $^\spadesuit$ CIT-EC, Bielefed University \\
-    Bielefeld, Germany \\
-{\scriptsize\tt\{cimiano@cit-ec.uni-bielefeld.de\}}}
-\date{}
+\usepackage{csquotes}
 
 \begin{document}
+\title{Linghub: Aggregated Metadata about Language Resources as Linked Data}
+
+\numberofauthors{2} 
+\author{
+\alignauthor
+John P. McCrae\\
+       \affaddr{CIT-EC, Bielefeld University}\\
+       \affaddr{Bielefeld, Germany}\\
+       \email{jmccrae@cit-ec.uni-bielefeld.de}
+\alignauthor
+Philipp Cimiano\\
+       \affaddr{CIT-EC, Bielefeld University}\\
+       \affaddr{Bielefeld, Germany}\\
+       \email{cimiano@cit-ec.uni-bielefeld.de}
+   }
+
 \maketitle
 \begin{abstract}
     Language resources are an essential component of any natural language
@@ -41,7 +37,8 @@
     and search mechanisms. We present Linghub a new portal that aggregates data
     from a range of sources and uses linked data to make them available under a
     common interface. Furthermore, we use facetted browsing and SPARQL query to
-    show how this can help to answer real user problems.
+    show how this can help to answer real user problems extracted from a mailing
+    list for linguists.
 \end{abstract}
 
 \section{Introduction}
@@ -153,19 +150,19 @@ by each contributing instance, with only a small common section giving the
 resource title and download link. We thus developed distinct mappings for the
 largest X institutes.
 
-\begin{table*}
-	\centering	
-	\begin{tabular}{p{50mm}p{50mm}|cc}
-	Property     & Target             & Links        \\
-	\hline
-	Language     & LexVo              & 92,717       \\
-	Type         & BabelNet           & 12,139       \\
-	Usage        & META-SHARE OWL     & 1,310        \\
-	Rights       & License Ontology   & 103          \\
-	Backlink     & Original Resources & 146,765      \\
-	\end{tabular}
-	\caption{Number of introduced links in the Linghub data\label{tab:links}}
-\end{table*}	
+%\begin{table*}
+%	\centering	
+%	\begin{tabular}{p{50mm}p{50mm}|cc}
+%	Property     & Target             & Links        \\
+%	\hline
+%	Language     & LexVo              & 92,717       \\
+%	Type         & BabelNet           & 12,139       \\
+%	Usage        & META-SHARE OWL     & 1,310        \\
+%	Rights       & License Ontology   & 103          \\
+%	Backlink     & Original Resources & 146,765      \\
+%	\end{tabular}
+%	\caption{Number of introduced links in the Linghub data\label{tab:links}}
+%\end{table*}	
 
 Two key issues emerge when collecting data from a heterogenous set of sources 
 such as we are doing. Firstly, the data is likely to be noisy and inconsistent 
@@ -197,33 +194,110 @@ triples.
 In order to enable users to quickly and easily discover datasets, we set up a 
 portal for browsing the dataset. Naturally we set this up as a site that publishes
 the individual records as either RDF or HTML, with the actual content delivered
-to the client decided by means of content negotiation. In addition, we provide a 
-number of mechanisms by which users and automated agents can discover a dataset. 
-In particular, for users we allowed browsing by means of faceted browsing of 
-principle aspects of datasets including language. In addition, we enabled a full
-text search of the data based on the description. Machine based agents may access
+to the client decided by means of content negotiation. We developed 
+templates that render the RDF in a readable manner, while still appearing close
+to the data so that users would get a consistent view of a dataset record even
+if it came from a different original source and hence had very different
+properties.
+In addition, we provide a 
+number of mechanisms by which users and automated agents can discover a dataset.
+For users, we allowed resources to be discovered by means of faceted browsing by
+allowing users to select properties and their values. We fixed the list of
+properties in advance to those that have been harmonized so as to not overload
+the user with choices for properties that only occur for a few datasets and also
+to enable the compilation of indexes to speed up the page load. In addition the
+front page of Linghub contains a free-text search engine allowing the users to
+query fields by a property. This free-text search engine is powered by a
+separate index which includes not only the text of data properties but also the
+labels of URIs which appear as the value of object properties. 
+Machine based agents may access
 the endpoint by means of SPARQL querying, although the endpoint limits the agents
-to a very specific subset of the SPARQL query language. This is to ensure that 
-the SPARQL querying remains stable and consistent, as full SPARQL queries could
-easily destabilize the server and adding timeouts could lead to unpredictable
-failures. In addition the server returns SPARQL JSON results and so can be called
-easily from a web browser.
+to a subset of the SPARQL query language. The goal of this is to enable constant
+query-time without overloading our server. The nature of SPARQL makes it very
+easy for users to write queries that are of a complexity that would not be easy
+to answer. Other sites have attempted to handle this by enforcing timeouts on
+SPARQL queries. In general we find this solution to be sub-optimal as it
+means that queries may fail unpredictably if the server has many concurrent
+connections. Instead, we limit the complexity of the queries themselves by
+requiring that the triples have certain properties that can be easily answered.
+These include:
+
+\begin{enumerate}
+    \item A required limit on the number of results;
+    \item The property may not be a variable, thus limiting the number of
+        results;
+    \item The query must be a 'tree' in that every triples should be connected
+        from a single root node.
+\end{enumerate}
+
+Furthermore, the SPARQL endpoint also by default returns SPARQL-Json
+results\cite{}, so that the results may be easily applied. This is based on the
+fact that many clients, notably client-side Javascript in browsers, will not
+accept XML due to security concerns. Other clients may still obtain SPARQL-XML
+by supplying the appropriate header or parameter in the query.
 
 \section{Using Linghub}
 
-Questions:
+In order to evaluate the practicality of Linghub as a system for finding
+language resources, we wanted to identify users who were searching for languages
+resources. To this end, we used \emph{Corpora List} a mailing list used by many
+researchers in corpus linguistics to discuss corpora. In particular, we looked
+at three queries from users.
 
-Thapelo J. Otlogetswe <oitlogetswe@gmail.com>
+\textquote[Thapelo J. Otlogetswe, Feb. 5th
+2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/021993.html}}]{[...] desparately needs an Igbo corpus.}
 
-[...] desparately needs an Igbo corpus.
+Igbo is a language of Nigeria and Equatorial Guinea and is identified with the
+language code {\tt ibo}. Simply typing ``Igbo'' into the search interface of
+Linghub finds a number of resources that could be used. For many of these
+resources Igbo is the \emph{subject}. Although, there is a language property
+some sources decided not to use this Dublin Core category. In addition these
+resources are marked with a \emph{type} that is mapped to the META-SHARE {\tt
+corpus} individual even though the resources do not originate from META-SHARE
+due to our harmonization. We can search for
+both language and subject with the following query:
 
-Márton Makrai <makrai.nlp@gmail.com>
+\begin{verbatim}
+SELECT ?resource WHERE {
+ ?resource
+   dct:language iso639:ibo |
+   dc:subject "Igbo" ;
+   dct:type metashare:corpus .
+}
+\end{verbatim}
 
-I am looking for a Lithuanian gigaword corpus for a research project.
+\textquote[Márton Makrai, Feb. 24th
+2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/022103.html}}]{I
+am looking for a Lithuanian gigaword corpus for a research project.}
 
-Md. Hasanuzzaman <hasanuzzaman.im@gmail.com>
+Finding a corpus for a European language such as Lithuanian is generally not a
+challenge, however this user also has the requirement that the resource has over
+one billion words. We can easily use the META-SHARE properties to return the
+user a list of corpora with their associated sizes, as follows:
 
-I am looking for freely available geotagged tweets collection for research purpose.
+\begin{verbatim}
+SELECT ?resource ?size WHERE {
+  ?resource
+    ms:corpusInfo [
+      ms:languageInfo [
+        dct:language iso639:lit ;
+        ms:sizePerLanguage [
+          ms:size ?size ;
+          ms:sizeUnit ms:words
+        ]
+      ]
+    ] .
+}
+\end{verbatim}
+      
+\textquote[Md. Hasanuzzaman, Feb. 16th
+2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/022044.html}}]{I
+    am looking for freely available geotagged tweets collection for research
+purpose.}
+
+Several of the search terms here are unfortunately not found anywhere in our
+data, namely `geotagged' and `tweets' so...
+
 
 
 \section{Conclusion}
@@ -266,7 +340,7 @@ processing and artificial intelligence.
 %
 %+Asun
 
-\bibliographystyle{acl}
+\bibliographystyle{abbrv}
 \bibliography{../linghub-acl15}
 
 \end{document}
