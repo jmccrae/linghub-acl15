@@ -11,18 +11,19 @@
 \usepackage{csquotes}
 
 \begin{document}
-\title{Linghub: Aggregated Metadata about Language Resources as Linked Data}
+\title{Linghub: a Linked Data based portal supporting the discovery of language
+resources}
 
 \numberofauthors{2} 
 \author{
 \alignauthor
 John P. McCrae\\
-       \affaddr{CIT-EC, Bielefeld University}\\
+       \affaddr{Cognitive Interaction Technology, Cluster of Excellence, Bielefeld University}\\
        \affaddr{Bielefeld, Germany}\\
-       \email{jmccrae@cit-ec.uni-bielefeld.de}
+       \email{john@mccr.ae}
 \alignauthor
 Philipp Cimiano\\
-       \affaddr{CIT-EC, Bielefeld University}\\
+       \affaddr{Cognitive Interaction Technology, Cluster of Excellence, Bielefeld University}\\
        \affaddr{Bielefeld, Germany}\\
        \email{cimiano@cit-ec.uni-bielefeld.de}
    }
@@ -32,11 +33,14 @@ Philipp Cimiano\\
     Language resources are an essential component of any natural language
     processing system and such systems can only be applied to new languages and
     domains if appropriate resources can be found. Currently the task of finding
-    new language resources is complicated by the fact that their records are
+    new language resources for a particular task or application is complicated by the fact that records about such
+    resources are
     stored in different repositories with different models, different quality
-    and search mechanisms. We present Linghub a new portal that aggregates data
-    from a range of sources and uses linked data to make them available under a
-    common interface. Furthermore, we use facetted browsing and SPARQL query to
+    and search mechanisms. To remedy this situation, we present Linghub a new
+    portal that aggregates and indexes data
+    from a range of sources and repositories and applied the Linked Data
+    Principles to expose all the metadata under a
+    common interface. Furthermore, we use faceted browsing and SPARQL query to
     show how this can help to answer real user problems extracted from a mailing
     list for linguists.
 \end{abstract}
@@ -52,39 +56,57 @@ may be available. To this there have been a number of projects that have
 attempted to collect such a catalogue using various methods and with differing
 degrees of data quality. We present a new portal, Linghub, that aims to integrate all
 these data from different sources by means of linked data and thus to create a
-portal, whereby all information about language resources can be included and
-queried using a common methodology. As such, this resource will enable wider
+website, whereby all information about language resources can be included and
+queried using a common methodology. The goal of Linghub is thus to enable wider
 discovery of language resources for researchers in NLP, computational
 linguistics and linguistics.
 
-Currently, the approaches to metadata collection can be split into two broad
-classes: firstly, \emph{curatorial} resources, which are those for which collections of
-language resources are maintained by one or more institute. Such resources have
-an advantage in that such metadata is normally of very high quality, however the
-resulting data often fails to cover the whole spectrum of data available.
-Examples of this include the META-SHARE~\cite{federmann2012meta} project and the
-CLARIN project's Virtual Language Observatory~\cite[VLO]{van2012semantic}. On
-the other hand, \emph{collaborative} approaches rely on data publishers
-self-reporting data about their own language resources. This can be advantageous
-as it allows reporting by researchers not directly collected to existing
-infrastructure projects, however the resulting data is often of lower quality as
-the systems may use free-text input or tagging input rather than controlled
-vocabularies, as they are easier for non-expert users to understand.
+Currently, two approaches to metadata collection for language resources can be
+distinguished. Firstly, we distinguish a \emph{curatorial} approach to metadata
+collection in which a repository of language resource metadata is maintained by
+a cross-institution organization such as META-SHARE~\cite{federmann2012meta} or
+CLARIN project's Virtual Language Observatory~\cite[VLO]{van2012semantic}. This
+approach is characterized though high-quality metadata that are entered by
+experts, at the expense of coverage. A \emph{collaborative} approach, on the other
+hand, allows anyone to publish language resource metadata. Examples of this are
+the LREMap~\cite{calzolari2012lre} or Datahub\footnote{\url{http://datahub.io}}. A process for controlling the quality of metadata entered
+is typically lacking for such collaborative repositories, leading to less
+qualitative metadata and inhomogeneous metadata resulting from free-text fields,
+user-provided tags and the lack of controlled vocabularies.
+%Currently, the approaches to metadata collection can be split into two broad
+%classes: firstly, \emph{curatorial} resources, which are those for which collections of
+%language resources are maintained by one or more institute. Such resources have
+%an advantage in that such metadata is normally of very high quality, however the
+%resulting data often fails to cover the whole spectrum of data available.
+%Examples of this include the META-SHARE~\cite{federmann2012meta} project and the
+%CLARIN project's Virtual Language Observatory~\cite[VLO]{van2012semantic}. On
+%the other hand, \emph{collaborative} approaches rely on data publishers
+%self-reporting data about their own language resources. This can be advantageous
+%as it allows reporting by researchers not directly involved in existing
+%infrastructure projects, however the resulting data is often of lower quality as
+%the systems may use free-text input or tagging input rather than controlled
+%vocabularies, as they are easier for non-expert users to understand.
 
 Given the nature of this difference we wish to make data available from multiple
 sources in a homogeneous manner and to this end we adopted a model based on the
 DCAT data model~\cite{maali2014data} along with properties from Dublin
 Core~\cite{weibel1998dublin}. In addition, we used the RDF
 version~\cite{mccrae2015ontology} of the META-SHARE
-model~\cite{gavrilidou2012meta}, to provide for metadata properties that are
+model~\cite{gavrilidou2012meta} to provide for metadata properties that are
 specific to language data and linguistic research. As such, in this paper we
 describe the creation of the largest collection of information about language
 resources and briefly describe its publication on the Web by means of linked
 data principles.
 
-The rest of the paper is structured as follows...
+The rest of the paper is structured as follows: firstly, we will describe
+related work in Section \ref{sec:related}, than we will describe the collection
+and processing of data in Section \ref{sec:dataset}. Next, we will describe the
+portal and how we envision users can access the data in Section \ref{sec:portal}
+and examine how real user queries could be answered with Linghub in Section
+\ref{sec:usecases}. Finally we conclude in Section \ref{sec:conclusion}.
 
 \section{Related Work}
+\label{sec:related}
 
 There have been several attempts to collect metadata about language resources
 mostly associated with large infrastructure projects. CLARIN has been collecting
@@ -96,7 +118,7 @@ META-SHARE~\cite{piperidis2012meta} from the META-NET project where language
 resources are collected and high-quality, manual entries are created for each
 record. Similarly, the Open Languages Archives
 Community~\cite[OLAC]{bird2003extending} collects data from a number of sources
-although the metadata collected is not itself open. A similar project called
+although the metadata collected is not itself open. Another related project called
 SHACHI has also collected some metadata~\cite{tohyama2008shachi}. There has also
 been an attempt to track language resources by means of assigning them an
 International Standard Language Resource Number (ISLRN) similar to an ISBN used
@@ -109,6 +131,7 @@ Datahub~\footnote{\url{http://datahub.io}} collects resources directly from
 those submitted to the website, but focusses primarily on linked data resources.
 
 \section{Dataset}
+\label{sec:dataset}
 
 \begin{table}
 	\centering
@@ -126,20 +149,23 @@ those submitted to the website, but focusses primarily on linked data resources.
 \end{table}
 
 In order to ensure that all the data from many sources can be queried in a
-homogenous manner we had to convert them to RDF. This process is also proved to
-be a valuable opportunity to align these vocabularies with standard vocabularies
-and fix any modelling errors. Two of our resources, LRE-Map and Datahub, were already available in RDF
-and thus, it should be the case that that the conversion of these resources
-required only renaming the URLs so that they would resolve without any
-collisions when uploaded to the Linghub portal. In fact, we also took this
-opportunity to fix a number of quality issues, such as fixing property values to
-either literals or URIs, reducing the number of blank nodes and changing
-modelling to that recommended in relevant standards, such as
-VOID~\cite{alexander2011describing}. 
+homogenous manner we made sure that the metadata from all the repositories mentioned in Table \ref{tab:size} into RDF.
+In doing this, we aligned the proprietary schemas used in these repositories to
+well-known semantic Web vocabularies and fixed existing modeling errors, such as
+using percent-encoded URIs for titles of resources or introducing URL links that
+would never resolve.
+Two of our resources, LRE-Map and Datahub, were already available in RDF, so that the conversion
+mainly involved developing an appropriate URL schema so that datasets were
+uniquely identified and thus to avoid collisions when uploading data into the
+LingHub portal. A number of quality issues were also fixed in doing this
+transformation, such as deciding whether property values should be literals or
+URIs, reducing the number of blank nodes and reusing existing metadata
+vocabularies such as VoID~\cite{alexander2011describing}.
 
-The other resources used XML schemas, for which we needed to create a custom
-conversion for each of them, which we did with the help of an invertible
-transformation language similar to XSLT. For META-SHARE, this was a challenging
+The other resources (CLARIN VLO and META-SHARE) were available in XML. We
+developed a custom
+converter for each of these resources building on a 
+transformation language similar to XSLT, which we developed. For META-SHARE, this was a challenging
 task as there were nearly a thousand unique tags defined and each one was
 examined to see if it was similar to an existing Semantic Web vocabulary, and in
 fact we ended up mapping to FOAF~\footnote{\url{http://xmlns.com/foaf/spec/}},
@@ -148,7 +174,7 @@ Ontology~\footnote{\url{http://www.w3.org/TR/mediaont-10/}}. In the case of
 CLARIN, there was actually a significant difference between the XML schemas used
 by each contributing instance, with only a small common section giving the
 resource title and download link. We thus developed distinct mappings for the
-largest X institutes.
+largest 5 institutes.
 
 %\begin{table*}
 %	\centering	
@@ -168,11 +194,16 @@ Two key issues emerge when collecting data from a heterogenous set of sources
 such as we are doing. Firstly, the data is likely to be noisy and inconsistent 
 in the properties it uses and more importantly in the values that these
 properties have. For example, languages may be represented by their English 
-names or alternatively by means of the codes such as the ISO 639 codes. Secondly,
-it is often the case that a dataset may be recorded in multiple sources and thus,
-we may create multiple records of the same dataset. Furthermore, we often see
-duplication in the form of multiple records describing different sections of a 
-single dataset or multiple usages of the single dataset. In order to remove 
+names or alternatively by means of the codes such as the ISO 639
+codes\footnote{\url{http://www.iso.org/iso/home/standards/language_codes.htm}}. 
+
+Secondly, it happens relatively frequently that dataset descriptions are
+duplicate as they are contained in multiple source repositories (currently this
+affects 5.0\% of resources).
+Furthermore, also intra-repository duplicates exist, resulting from the fact
+that in some repositories one metadata record is created for each language a
+resource is available in (this is the case for CLARIN for instance and
+represents 35.0\% of all resources). In order to remove
 these duplications we used state-of-the-art word sense disambiguation techniques, 
 including Babelfy~\cite{Moroetal:14tacl} to identify common controlled vocabularies and duplicate
 entries. For the case of properties we mapped to several existing resources, 
@@ -182,12 +213,15 @@ of the Dublin Core property \emph{is replaced by}. In the case that these entrie
 were subsets of resources the target of this link would be a new combined record
 for the entire resource and in the case of duplicate records collected from distinct
 sources we referred to the most complete triple, that is the record with the most
-triples.
+triples. The harmonization and description is described in more detail in McCrae
+et al.~\cite{mccrae2015reconciling}.
 
 \section{The Linghub portal}
 
+\label{sec:portal}
+
 \begin{figure*}
-\includegraphics[width=.9\textwidth]{linghub-screenshot.png}
+\includegraphics[width=\textwidth]{linghub-screenshot.png}
 \caption{A screenshot of the Linghub interface\label{fig:screenshot}}
 \end{figure*}
 
@@ -196,7 +230,7 @@ portal for browsing the dataset. Naturally we set this up as a site that publish
 the individual records as either RDF or HTML, with the actual content delivered
 to the client decided by means of content negotiation. We developed 
 templates that render the RDF in a readable manner, while still appearing close
-to the data so that users would get a consistent view of a dataset record even
+to the data in such a way that users would get a consistent view of a dataset record even
 if it came from a different original source and hence had very different
 properties.
 In addition, we provide a 
@@ -205,17 +239,17 @@ For users, we allowed resources to be discovered by means of faceted browsing by
 allowing users to select properties and their values. We fixed the list of
 properties in advance to those that have been harmonized so as to not overload
 the user with choices for properties that only occur for a few datasets and also
-to enable the compilation of indexes to speed up the page load. In addition the
+to enable the compilation of indexes to speed up page load times. In addition the
 front page of Linghub contains a free-text search engine allowing the users to
 query fields by a property. This free-text search engine is powered by a
 separate index which includes not only the text of data properties but also the
 labels of URIs which appear as the value of object properties. 
-Machine based agents may access
+Machine-based agents may access
 the endpoint by means of SPARQL querying, although the endpoint limits the agents
 to a subset of the SPARQL query language. The goal of this is to enable constant
 query-time without overloading our server. The nature of SPARQL makes it very
 easy for users to write queries that are of a complexity that would not be easy
-to answer. Other sites have attempted to handle this by enforcing timeouts on
+to answer and other sites have attempted to handle this by enforcing timeouts on
 SPARQL queries. In general we find this solution to be sub-optimal as it
 means that queries may fail unpredictably if the server has many concurrent
 connections. Instead, we limit the complexity of the queries themselves by
@@ -226,36 +260,50 @@ These include:
     \item A required limit on the number of results;
     \item The property may not be a variable, thus limiting the number of
         results;
-    \item The query must be a 'tree' in that every triples should be connected
+    \item The query must be a `tree' in that every triples should be connected
         from a single root node.
 \end{enumerate}
 
-Furthermore, the SPARQL endpoint also by default returns SPARQL-Json
-results\cite{}, so that the results may be easily applied. This is based on the
+Furthermore, the SPARQL endpoint also by default returns SPARQL-JSON
+results\cite{seaborne2013sparql}, so that the results may be easily applied. This is based on the
 fact that many clients, notably client-side Javascript in browsers, will not
 accept XML due to security concerns. Other clients may still obtain SPARQL-XML
 by supplying the appropriate header or parameter in the query.
 
-\section{Using Linghub}
+\section{Use Cases}
 
-In order to evaluate the practicality of Linghub as a system for finding
-language resources, we wanted to identify users who were searching for languages
-resources. To this end, we used \emph{Corpora List} a mailing list used by many
-researchers in corpus linguistics to discuss corpora. In particular, we looked
-at three queries from users.
+\label{sec:usecases}
 
-\textquote[Thapelo J. Otlogetswe, Feb. 5th
+As a proof-of-concept for LingHub, we discuss a number of realistic use cases
+that demonstrate the type of queries that can be answered using LingHub. In
+order to get realistic use cases, we collected queries for language resources
+from the \emph{Corpora List}, a mailing list used by researchers in corpus
+linguistics to discuss corpora. From questions posed in February 2015, 3 queries 
+are considered below as they are clear and well-stated questions that would have
+feasible answers. We chose these queries to provide an illustrative example of
+queries that can be directly answered using the Linghub portal, while discarding
+many other questions that were vague, unclearly stated or misused linguistic
+terminology.
+We discuss these queries and show how they can be formalized as
+SPARQL queries against LingHub and discuss whether reasonable answers were
+retrieved.
+
+\begin{enumerate}
+
+\item \textquote[Thapelo J. Otlogetswe, Feb. 5th
 2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/021993.html}}]{[...] desparately needs an Igbo corpus.}
 
 Igbo is a language of Nigeria and Equatorial Guinea and is identified with the
 language code {\tt ibo}. Simply typing ``Igbo'' into the search interface of
 Linghub finds a number of resources that could be used. For many of these
-resources Igbo is the \emph{subject}. Although, there is a language property
+resources Igbo is the value of the Dublin Core property \emph{subject}. Although, there is a language property
 some sources decided not to use this Dublin Core category. In addition these
 resources are marked with a \emph{type} that is mapped to the META-SHARE {\tt
 corpus} individual even though the resources do not originate from META-SHARE
 due to our harmonization. We can search for
-both language and subject with the following query:
+both language and subject with the following query\footnote{Note: We has
+    implemented some syntactic extensions to SPARQL. The \texttt{|} operator is
+a \texttt{UNION} with the same subject.}:
 
 \begin{verbatim}
 SELECT ?resource WHERE {
@@ -266,7 +314,7 @@ SELECT ?resource WHERE {
 }
 \end{verbatim}
 
-\textquote[Márton Makrai, Feb. 24th
+\item \textquote[Márton Makrai, Feb. 24th
 2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/022103.html}}]{I
 am looking for a Lithuanian gigaword corpus for a research project.}
 
@@ -289,18 +337,33 @@ SELECT ?resource ?size WHERE {
     ] .
 }
 \end{verbatim}
+
+Unfortunately, the results of this query show that no resource in Linghub is
+over one billion words in size for Lithuanian.
       
-\textquote[Md. Hasanuzzaman, Feb. 16th
+\item \textquote[Md. Hasanuzzaman, Feb. 16th
 2015\footnote{\url{http://mailman.uib.no/public/corpora/2015-February/022044.html}}]{I
     am looking for freely available geotagged tweets collection for research
 purpose.}
 
 Several of the search terms here are unfortunately not found anywhere in our
-data, namely `geotagged' and `tweets' so...
+data, namely `geotagged' and `tweets'. It would still be possible for this query
+to be answered by looking at related keywords such as `Twitter', and other
+aspects of this query can be handled (e.g., `for research purpose'), can be
+handled by means of the META-SHARE vocabulary.
 
+\end{enumerate}
+
+In summary, we saw that in two of the three cases the users' need could be
+clearly expressed as a SPARQL query and that in one of those cases, the query
+would return an answer as required, in the second case no suitable dataset is
+recorded. In the final case, the user's query does not match the structured data
+found in Linghub, but related resources can be found by using free text search.
 
 
 \section{Conclusion}
+
+\label{sec:conclusion}
 
 Linghub is a new site that collects data from a large number of sources and
 makes it queriable through a common mechanisms. Furthermore, the data has not
