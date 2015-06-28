@@ -20,32 +20,26 @@
 
 \title{Reconciling Heterogeneous Descriptions of Language Resources}
 
-%\author{John P. McCrae, Philipp Cimiano \\
-%  CIT-EC, Bielefeld University \\
-%  Bielefeld, Germany \\
-%  {\scriptsize\tt\{jmccrae, cimiano\}@cit-ec.uni-bielefeld.de} \\
-%  {\bf Victor Rodr\'iguez Doncel, Daniel Vila-Suero}\\
-%  {\bf Jorge Gracia} \\
-%  Universidad Polit\'ecnica de Madrid \\
-%  Madrid, Spain \\
-%  {\scriptsize\tt\{vrodriguez, dvila, jgracia\}@fi.upm.es} \\\And
-%  Luca Matteis, Roberto Navigli \\
-%  University of Rome, La Sapienza \\
-%  Rome, Italy \\
-%  {\scriptsize\tt \{matteis, navigli\}@di.uniroma1.it} \\
-%  {\bf Andrejs Abele, Gabriela Vulcu}\\
-%  {\bf Paul Buitelaar} \\
-%  Insight Centre, National University of Ireland\\
-%  Galway, Ireland \\
-%  {\scriptsize\tt \{andrejs.abele, gabriela.vulcu,}\\
-%  {\scriptsize\tt paul.buitelaar\}@insight-centre.org} \\}
+\author{John P. McCrae, Philipp Cimiano \\
+  CIT-EC, Bielefeld University \\
+  Bielefeld, Germany \\
+  {\scriptsize\tt\{jmccrae, cimiano\}@cit-ec.uni-bielefeld.de} \\
+  {\bf Victor Rodr\'iguez Doncel, Daniel Vila-Suero}\\
+  {\bf Jorge Gracia} \\
+  Universidad Polit\'ecnica de Madrid \\
+  Madrid, Spain \\
+  {\scriptsize\tt\{vrodriguez, dvila, jgracia\}@fi.upm.es} \\\And
+  Luca Matteis, Roberto Navigli \\
+  University of Rome, La Sapienza \\
+  Rome, Italy \\
+  {\scriptsize\tt \{matteis, navigli\}@di.uniroma1.it} \\
+  {\bf Andrejs Abele, Gabriela Vulcu}\\
+  {\bf Paul Buitelaar} \\
+  Insight Centre, National University of Ireland\\
+  Galway, Ireland \\
+  {\scriptsize\tt \{andrejs.abele, gabriela.vulcu,}\\
+  {\scriptsize\tt paul.buitelaar\}@insight-centre.org} \\}
  
-\author{Author \\
-    Address Line 1\\
-    Address Line 2\\
-{\scriptsize\tt email@example.com}}
-
-
 \date{}
 
 \begin{document}
@@ -84,8 +78,8 @@ discovering and finding resources that are pertinent to a particular task
 becomes increasingly difficult. While there are a number of repositories that
 collect and index metadata of language resources, such as
 META-SHARE~\cite{federmann2012meta},
-CLARIN~\cite{broeder2010data}, LRE-Map~\cite{calzolari2012lre} and
-Datahub.io\footnote{\url{http://datahub.io/}}, they do not provide a complete
+CLARIN~\cite{broeder2010data}, LRE-Map~\cite{calzolari2012lre},
+Datahub.io\footnote{\url{http://datahub.io/}} and OLAC~\cite{simons2003open}, they do not provide a complete
 solution to the discovery problem for two reasons. First, integrated search over
 all these different repositories is not possible, as they use different data
 models, different vocabularies and expose different interfaces and APIs. 
@@ -108,8 +102,7 @@ records in fact describe the same resource then queries for that resource will
 return too many resources that may lead to errors (or annoyance) for users. For
 example, the ``Universal Declaration of Human Rights'' is available in 444
 languages\footnote{\url{http://www.ohchr.org/en/udhr/pages/introduction.aspx}}
-and listing each translation as a single resource (as the CLARIN VLO does) is
-impractical. Furthermore, these resources may not match some queries, such as
+and listing each translation as a single resource (as the CLARIN VLO does) does  not correctly capture the nature of the resource. Furthermore, these resources may not match some queries, such as
 for example `resources in more than one language', and as such it is preferable to
 merge these individual records into a single complex record.
 %In this paper we address the challenge of harmonizing the metadata originating
@@ -162,7 +155,7 @@ collection and schema matching strategy in Section \ref{collection}. We describe
 our techniques for metadata harmonization in Section \ref{harmonization}. We
 describe our methods for duplication detection in Section \ref{duplicates}. The
 performance of the different techniques is reported in each of these sections.
-We discuss our methodology and approach from a larger point of view in Section
+We discuss our methodology and approach from a wider point of view in Section
 \ref{discussion}. 
 
 
@@ -178,8 +171,8 @@ There are different approach to data integration. One approach consists on
 mapping data to one \emph{monolithic} ontology that needs to be general enough
 to accommodate all the data categories from different sources. While this is 
 appealing as it supports integrated querying of data, a
-single ontology will necessarily be weaker at modelling some aspects of metadata
-records. In contrast, the linked data approach relies on
+single ontology cannot predict all aspects of metadata
+records, that all users may wish to record. In contrast, the linked data approach relies on
 multiple, standardized smaller and reusable vocabularies, each representing a 
 subset of the data.  In this line, some experts have recommended \cite{brooks2006towards}:
 
@@ -313,7 +306,7 @@ resolves, and whether the terms and conditions under which the resource can be
 used are specified. Further, we consider three key aspects that users need to
 know about resources to help them decide whether the resource matches their
 needs, namely: the type of the resource (corpus, lexical resource, etc.),
-languages covered, and intended use of the resource. We note that many resources
+ intended use of the resource and languages covered. We note that many resources
 have multiple values for the same property (e.g., language), thus we allow
 multiple values at the record level, while still permitting more specific
 annotation deeper in the record.
@@ -457,7 +450,7 @@ predefined values in LRE-Map to one of the 83 values predefined in META-SHARE.
 For the user-provided intended usage values, we developed a matching algorithm
 that identifies the corresponding META-SHARE intended use values. First we
 tokenized the expressions, then we stemmed the tokens using the Snowball
-stemmer, and we performed a string inclusion match, i.e. checking whether
+stemmer~\cite{porter2001snowball}, and we performed a string inclusion match, i.e. checking whether
 META-SHARE usages are included in the free text entries. For some entries we
 retrieved several matches (e.g.  `Document Classification, Text categorisation'
 matched both `document classification' and `text categorisation'), assuming that
@@ -659,7 +652,7 @@ observations:
         in the data. However, we found a number of entries having the same
         download URL. This is due to the fact that different resources share
         SPARQL endpoints or download pages, but the records did not describe the
-        same resource.
+        same resource and so we did not merge these resources.
     
 \end{description}
 
@@ -718,7 +711,7 @@ or were different versions of each other. Table \ref{tab:dupe-precision} shows
 these results. We see that with 99\% precision the method identifying duplicates
 if both title and URL match yields the best results. While the recall is
 difficult to assess, an analysis of the data quickly reveals that there are many
-duplicates not detected using this method. For example, for the Stanford Parser,
+duplicates not detected using this method. For example, for the Stanford Parser~\cite{de2006generating},
 we find metadata records with all of the following titles: ``Stanford Parser'',
 ``Stanford Dependency Parser'',  ``Stanford Lexicalized Parser'', ``Stanford's
 NLP Parser'', ``The Stanford Parser'', ``The Stanford Parser: A Lexicalized
@@ -826,15 +819,16 @@ linguistics.
 
 \section*{Acknowledgments}
 
-%LingHub was made possible due to significant help from a large number of
-%people, in particular we would like to thank the following people: Benjamin
-%Siemoneit (Bielefeld University), Tiziano Flati (University of Rome, La
-%Sapienza), Martin Br\"ummer (University of Leipzig), Sebastian Hellmann
-%(University of Leipzig), Bettina Klimek (University of Leipzig), Penny
-%Labropolou (IEA-ILSP), Juli Bakagianni (IEA-ILSP), Stelios Piperidis
-%(IEA-ILSP), Nicoletta Calzolari (ILC-CNR), Riccardo del Gratta (ILC-CNR), Marta
-%Villegas (Pompeu Fabra), N\'uria Bel (Pompeu Fabra) and Christian Chiarcos
-%(Goethe-University Frankfurt).
+LingHub was made possible due to significant help from a large number of
+people, in particular we would like to thank the following people: Benjamin
+Siemoneit (Bielefeld University), Tiziano Flati (University of Rome, La
+Sapienza), Martin Br\"ummer (University of Leipzig), Sebastian Hellmann
+(University of Leipzig), Bettina Klimek (University of Leipzig), Penny
+Labropolou (IEA-ILSP), Juli Bakagianni (IEA-ILSP), Stelios Piperidis
+(IEA-ILSP), Nicoletta Calzolari (ILC-CNR), Riccardo del Gratta (ILC-CNR), Marta
+Villegas (Pompeu Fabra), N\'uria Bel (Pompeu Fabra), Asunci\'on G\'omez-P\'erez 
+(Universidad Polit\'ecnica de Madrid) and Christian Chiarcos
+(Goethe-University Frankfurt).
 %
 %+Asun
 
