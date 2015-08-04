@@ -17,13 +17,13 @@ resources}
 \numberofauthors{2} 
 \author{
 \alignauthor
-John P. McCrae\\
-       \affaddr{Cognitive Interaction Technology, Cluster of Excellence, Bielefeld University}\\
-       \affaddr{Bielefeld, Germany}\\
+John P. McCrae\textsuperscript{1,2}\\
+       \affaddr{\textsuperscript{1}Insight Centre, National University of Ireland, Galway}\\
+       \affaddr{Galway, Ireland}\\
        \email{john@mccr.ae}
 \alignauthor
-Philipp Cimiano\\
-       \affaddr{Cognitive Interaction Technology, Cluster of Excellence, Bielefeld University}\\
+Philipp Cimiano\textsuperscript{2}\\
+       \affaddr{\textsuperscript{2}Cognitive Interaction Technology, Cluster of Excellence, Bielefeld University}\\
        \affaddr{Bielefeld, Germany}\\
        \email{cimiano@cit-ec.uni-bielefeld.de}
    }
@@ -36,14 +36,22 @@ Philipp Cimiano\\
     new language resources for a particular task or application is complicated by the fact that records about such
     resources are
     stored in different repositories with different models, different quality
-    and search mechanisms. To remedy this situation, we present Linghub a new
+    and search mechanisms. To remedy this situation, we present Linghub, a new
     portal that aggregates and indexes data
     from a range of sources and repositories and applied the Linked Data
     Principles to expose all the metadata under a
-    common interface. Furthermore, we use faceted browsing and SPARQL query to
+    common interface. Furthermore, we use faceted browsing and SPARQL queries to
     show how this can help to answer real user problems extracted from a mailing
     list for linguists.
 \end{abstract}
+
+Major comments:
+* Why not integrate the datasets in an already developed catalog?
+* How to integrate additional datasets
+* Information about model... give example
+* Paper more self-contained
+* Deeper description of use case
+
 
 \section{Introduction}
 
@@ -88,7 +96,8 @@ user-provided tags and the lack of controlled vocabularies.
 %vocabularies, as they are easier for non-expert users to understand.
 
 Given the nature of this difference we wish to make data available from multiple
-sources in a homogeneous manner and to this end we adopted a model based on the
+sources in a homogeneous manner and we saw the development of a new linked data
+portal as the primary method to achieve this. To this end we adopted a model based on the
 DCAT data model~\cite{maali2014data} along with properties from Dublin
 Core~\cite{weibel1998dublin}. In addition, we used the RDF
 version~\cite{mccrae2015ontology} of the META-SHARE
@@ -99,7 +108,7 @@ resources and briefly describe its publication on the Web by means of linked
 data principles.
 
 The rest of the paper is structured as follows: firstly, we will describe
-related work in Section \ref{sec:related}, than we will describe the collection
+related work in Section \ref{sec:related}, then we will describe the collection
 and processing of data in Section \ref{sec:dataset}. Next, we will describe the
 portal and how we envision users can access the data in Section \ref{sec:portal}
 and examine how real user queries could be answered with Linghub in Section
@@ -127,7 +136,7 @@ to track books~\cite{choukri2012using}.
 On the contrary some resources have instead collected data directly from
 creators of the resources, for example the LRE-Map~\cite{calzolari2012lre} collects data from
 authors of papers submitted to conference, such as LREC. Similarly,
-Datahub~\footnote{\url{http://datahub.io}} collects resources directly from
+Datahub collects resources directly from
 those submitted to the website, but focusses primarily on linked data resources.
 
 \section{Dataset}
@@ -145,11 +154,11 @@ those submitted to the website, but focusses primarily on linked data resources.
 	\hline
 	All                  & 147,447    & 4,091,157\\
 	\end{tabular}
-	\caption{Size of Linghub dataset by source\label{tab:size}}
+	\caption{Size of Linghub datasets by source\label{tab:size}}
 \end{table}
 
 In order to ensure that all the data from many sources can be queried in a
-homogenous manner we made sure that the metadata from all the repositories mentioned in Table \ref{tab:size} into RDF.
+homogenous manner we made sure that the metadata from all the repositories mentioned in Table \ref{tab:size} was available as RDF.
 In doing this, we aligned the proprietary schemas used in these repositories to
 well-known semantic Web vocabularies and fixed existing modeling errors, such as
 using percent-encoded URIs for titles of resources or introducing URL links that
@@ -157,7 +166,7 @@ would never resolve.
 Two of our resources, LRE-Map and Datahub, were already available in RDF, so that the conversion
 mainly involved developing an appropriate URL schema so that datasets were
 uniquely identified and thus to avoid collisions when uploading data into the
-LingHub portal. A number of quality issues were also fixed in doing this
+Linghub portal. A number of quality issues were also fixed in doing this
 transformation, such as deciding whether property values should be literals or
 URIs, reducing the number of blank nodes and reusing existing metadata
 vocabularies such as VoID~\cite{alexander2011describing}.
@@ -216,6 +225,11 @@ sources we referred to the most complete triple, that is the record with the mos
 triples. The harmonization and description is described in more detail in McCrae
 et al.~\cite{mccrae2015reconciling}.
 
+Currently, there is no direct method for users to provide metadata to the repository,
+however it is foreseen that users could submit valid DCAT files to Linghub. We do
+note that Datahub allows any user to submit a dataset and such datasets will quickly be 
+picked up by Linghub and added to the repository in this manner.
+
 \section{The Linghub portal}
 
 \label{sec:portal}
@@ -236,7 +250,7 @@ properties.
 In addition, we provide a 
 number of mechanisms by which users and automated agents can discover a dataset.
 For users, we allowed resources to be discovered by means of faceted browsing by
-allowing users to select properties and their values. We fixed the list of
+enabling users to select properties and their values. We fixed the list of
 properties in advance to those that have been harmonized so as to not overload
 the user with choices for properties that only occur for a few datasets and also
 to enable the compilation of indexes to speed up page load times. In addition the
@@ -274,8 +288,8 @@ by supplying the appropriate header or parameter in the query.
 
 \label{sec:usecases}
 
-As a proof-of-concept for LingHub, we discuss a number of realistic use cases
-that demonstrate the type of queries that can be answered using LingHub. In
+As a proof-of-concept for Linghub, we discuss a number of realistic use cases
+that demonstrate the type of queries that can be answered using Linghub. In
 order to get realistic use cases, we collected queries for language resources
 from the \emph{Corpora List}, a mailing list used by researchers in corpus
 linguistics to discuss corpora. From questions posed in February 2015, 3 queries 
@@ -285,7 +299,7 @@ queries that can be directly answered using the Linghub portal, while discarding
 many other questions that were vague, unclearly stated or misused linguistic
 terminology.
 We discuss these queries and show how they can be formalized as
-SPARQL queries against LingHub and discuss whether reasonable answers were
+SPARQL queries against Linghub and discuss whether reasonable answers were
 retrieved.
 
 \begin{enumerate}
@@ -301,7 +315,7 @@ some sources decided not to use this Dublin Core category. In addition these
 resources are marked with a \emph{type} that is mapped to the META-SHARE {\tt
 corpus} individual even though the resources do not originate from META-SHARE
 due to our harmonization. We can search for
-both language and subject with the following query\footnote{Note: We has
+both language and subject with the following query\footnote{Note: We have
     implemented some syntactic extensions to SPARQL. The \texttt{|} operator is
 a \texttt{UNION} with the same subject.}:
 
@@ -358,8 +372,13 @@ In summary, we saw that in two of the three cases the users' need could be
 clearly expressed as a SPARQL query and that in one of those cases, the query
 would return an answer as required, in the second case no suitable dataset is
 recorded. In the final case, the user's query does not match the structured data
-found in Linghub, but related resources can be found by using free text search.
-
+found in Linghub, but related resources can be found by using free text search. 
+As such, we see that Linghub enables users to better find their resources than
+with previous approaches, although it is still not satisfactory for all user
+queries. In particular, the crucial defect in the final query is that there is
+no specific metadata that would indicate if a resource is from a social media
+site or not, and this would require deeper understanding of the textual components
+of resource descriptions to better handle.
 
 \section{Conclusion}
 
@@ -374,6 +393,15 @@ agents to find new resources and use them for applications in natural language
 processing and artificial intelligence.
 
 \section*{Acknowledgments}
+
+This work has been funded by the LIDER project funded under the European Commission 
+Seventh Framework
+Program (FP7-610782), 
+the Cluster of Excellence Cognitive
+Interaction Technology `CITEC' (EXC 277) at Bielefeld University, which
+is funded by the German Research Foundation (DFG), and the Insight Centre which
+is funded by the Science Foundation Ireland under Grant Number SFI/12/RC/2289.
+
 
 %\\
 %  {\bf Victor Rodr\'iguez Doncel, Daniel Vila-Suero}\\
